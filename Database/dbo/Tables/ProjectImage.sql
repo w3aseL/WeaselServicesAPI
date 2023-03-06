@@ -1,0 +1,10 @@
+﻿CREATE TABLE [dbo].[ProjectImage]
+(
+	[Id] INT NOT NULL PRIMARY KEY IDENTITY(1,1),
+	[ProjectId] UNIQUEIDENTIFIER NOT NULL,
+	[ImageId] UNIQUEIDENTIFIER NOT NULL,
+	[IsLogo] BIT NOT NULL DEFAULT 0,
+
+	CONSTRAINT FK_ProjectImage_Project FOREIGN KEY (ProjectId) REFERENCES [Project]([Id]),
+	CONSTRAINT FK_ProjectImage_Image FOREIGN KEY (ImageId) REFERENCES [Image]([Id])
+)

@@ -68,5 +68,24 @@
     <Build Include="dbo\Tables\User.sql" />
     <Build Include="dbo\Tables\UserAccountRequest.sql" />
     <Build Include="dbo\Tables\BlacklistedToken.sql" />
+    <Build Include="dbo\Tables\SpotifyAccount.sql" />
+    <Build Include="dbo\Tables\SpotifyAccountRequest.sql" />
+    <Build Include="dbo\Tables\SpotifySong.sql" />
+    <Build Include="dbo\Tables\SpotifyArtist.sql" />
+    <Build Include="dbo\Tables\SpotifyAlbum.sql" />
+    <Build Include="dbo\Tables\SpotifySongArtist.sql" />
+    <Build Include="dbo\Tables\SpotifyArtistAlbum.sql" />
+    <Build Include="dbo\Tables\SpotifySongAlbum.sql" />
+    <Build Include="dbo\Tables\SpotifySession.sql" />
+    <Build Include="dbo\Tables\SpotifyTrackPlay.sql" />
+    <Build Include="dbo\Tables\Category.sql" />
+    <Build Include="dbo\Tables\Image.sql" />
+    <Build Include="dbo\Tables\Education.sql" />
+    <Build Include="dbo\Tables\Position.sql" />
+    <Build Include="dbo\Tables\Tool.sql" />
+    <Build Include="dbo\Tables\Project.sql" />
+    <Build Include="dbo\Tables\ProjectImage.sql" />
+    <Build Include="dbo\Tables\ProjectTool.sql" />
+    <Build Include="dbo\Tables\Resume.sql" />
   </ItemGroup>
 </Project>

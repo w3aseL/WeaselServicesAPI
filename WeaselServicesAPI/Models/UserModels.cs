@@ -51,4 +51,10 @@ namespace WeaselServicesAPI
         public string RefreshToken { get; set; }
         public UserModel User { get; set; }
     }
+
+    public class RefreshModel
+    {
+        [Required]
+        public string RefreshToken { get; set; }
+    }
 }

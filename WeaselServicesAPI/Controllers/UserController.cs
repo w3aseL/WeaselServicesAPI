@@ -84,6 +84,25 @@ namespace WeaselServicesAPI.Controllers
             }
         }
 
+        [HttpPost, Route("refresh")]
+        public JsonResult RefreshToken(RefreshModel model)
+        {
+            try
+            {
+                var accessToken = _service.RefreshAccessToken(model.RefreshToken);
+
+                return ResponseHelper.GenerateResponse(new { AccessToken = accessToken }, (int)HttpStatusCode.OK);
+            }
+            catch (UserNotFoundException e)
+            {
+                return ResponseHelper.GenerateResponse(new { Message = e.Message }, (int) HttpStatusCode.BadRequest);
+            }
+            catch (Exception e)
+            {
+                return ResponseHelper.GenerateResponse(new { Message = e.Message }, (int) HttpStatusCode.InternalServerError);
+            }
+        }
+
         // TODO: Change password route
     }
 }

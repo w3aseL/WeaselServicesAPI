@@ -109,5 +109,37 @@ namespace WeaselServicesAPI.Services
                 User = new UserModel(user)
             };
         }
+
+        public string RefreshAccessToken(string refreshToken)
+        {
+            // get uuid from token
+            var uuid = "";
+            var validateCode = _jwtGenerator.ValidateToken(refreshToken, false, out uuid);
+            if (validateCode != 0)
+                throw new UserNotFoundException(GetValidationCodeError(validateCode, false));
+
+            // fetch user
+            var user = _ctx.Users.Where(u => u.Uuid.ToString() == uuid).FirstOrDefault();
+            if (user is null)
+                throw new UserNotFoundException("Could not find user with that identifier!");
+
+            return _jwtGenerator.GenerateToken(user, TokenType.Access);
+        }
+
+        private string GetValidationCodeError(int errorCode, bool isAccessToken)
+        {
+            var tokenStr = isAccessToken ? "access" : "refresh";
+
+            switch(errorCode)
+            {
+                case -1:
+                case -3:
+                    return $"The { tokenStr } token provided is not valid!";
+                case -2:
+                    return $"The { tokenStr } token provided is not the correct token type!";
+            }
+
+            return "";
+        }
     }
 }

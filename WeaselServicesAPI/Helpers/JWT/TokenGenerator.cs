@@ -31,7 +31,12 @@ namespace WeaselServicesAPI.Helpers.JWT
             var now = DateTime.UtcNow;
             var tokenDescriptor = new SecurityTokenDescriptor
             {
-                Subject = new ClaimsIdentity(new[] { new Claim(ClaimTypes.NameIdentifier, u.Uuid.ToString()), new Claim(ClaimTypes.Name, u.Username), new Claim(ClaimTypes.Email, u.Email) }),
+                Subject = new ClaimsIdentity(new[] {
+                    new Claim(ClaimTypes.Role, type.ToString()),
+                    new Claim(ClaimTypes.NameIdentifier, u.Uuid.ToString()),
+                    new Claim(ClaimTypes.Name, u.Username),
+                    new Claim(ClaimTypes.Email, u.Email)
+                }),
                 Expires = now.AddMinutes(Convert.ToInt32(GetExpirationTimeByTokenType(type))),
                 SigningCredentials = new SigningCredentials(
                     new SymmetricSecurityKey(symmetricKey),
@@ -44,20 +49,30 @@ namespace WeaselServicesAPI.Helpers.JWT
             return token;
         }
 
-        public bool ValidateToken(string token, out string uuid)
+        public int ValidateToken(string token, bool isAccess, out string uuid)
         {
             uuid = null;
 
+            // get principal and identity
             var simplePrinciple = GetPrincipal(token);
             var identity = simplePrinciple.Identity as ClaimsIdentity;
 
+            // check identity
             if (identity == null || !identity.IsAuthenticated)
-                return false;
+                return -1;
 
+            // validate type of token
+            var tokenType = isAccess ? TokenType.Access : TokenType.Refresh;
+            var tokenClaim = identity.FindFirst(ClaimTypes.Role);
+            if (tokenClaim?.Value != tokenType.ToString())
+                return -2;
+
+            // fetch uuid
             var uuidClaim = identity.FindFirst(ClaimTypes.NameIdentifier);
             uuid = uuidClaim?.Value;
 
-            return !string.IsNullOrEmpty(uuid);
+
+            return !string.IsNullOrEmpty(uuid) ? 0 : -3;
         }
 
         private ClaimsPrincipal GetPrincipal(string token)

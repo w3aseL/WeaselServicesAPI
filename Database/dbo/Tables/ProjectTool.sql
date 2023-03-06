@@ -1,0 +1,9 @@
+﻿CREATE TABLE [dbo].[ProjectTool]
+(
+	[Id] INT NOT NULL PRIMARY KEY IDENTITY(1,1),
+	[ProjectId] UNIQUEIDENTIFIER NOT NULL,
+	[ToolId] INT NOT NULL,
+
+	CONSTRAINT FK_ProjectTool_Project FOREIGN KEY (ProjectId) REFERENCES [Project]([Id]),
+	CONSTRAINT FK_ProjectTool_Tool FOREIGN KEY (ToolId) REFERENCES [Tool]([Id])
+)

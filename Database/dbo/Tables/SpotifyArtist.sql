@@ -1,0 +1,6 @@
+﻿CREATE TABLE [dbo].[SpotifyArtist]
+(
+	[Id] VARCHAR(255) NOT NULL PRIMARY KEY,
+	[Name] VARCHAR(511) NOT NULL,
+	[URL] VARCHAR(511) NULL
+)

@@ -19,5 +19,9 @@ public partial class User
 
     public virtual ICollection<BlacklistedToken> BlacklistedTokens { get; } = new List<BlacklistedToken>();
 
+    public virtual ICollection<SpotifyAccountRequest> SpotifyAccountRequests { get; } = new List<SpotifyAccountRequest>();
+
+    public virtual ICollection<SpotifyAccount> SpotifyAccounts { get; } = new List<SpotifyAccount>();
+
     public virtual ICollection<UserAccountRequest> UserAccountRequests { get; } = new List<UserAccountRequest>();
 }

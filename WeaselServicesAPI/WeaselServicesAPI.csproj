@@ -6,6 +6,7 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <UserSecretsId>d8bb2ea6-2477-4df7-a8bc-489a46a6f85a</UserSecretsId>
     <DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
+    <Configurations>Debug;Release;QA</Configurations>
   </PropertyGroup>
 
   <ItemGroup>
@@ -28,6 +29,8 @@
 
   <ItemGroup>
     <ProjectReference Include="..\DataAccessLayer\DataAccessLayer.csproj" />
+    <ProjectReference Include="..\PortfolioLibrary\PortfolioLibrary.csproj" />
+    <ProjectReference Include="..\SpotifyAPILibrary\SpotifyAPILibrary.csproj" />
   </ItemGroup>
 
 </Project>
