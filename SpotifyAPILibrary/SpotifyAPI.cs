@@ -66,5 +66,23 @@ namespace SpotifyAPILibrary
 
             return _stateManager.GetActiveState(accountId).SerializePlayerState();
         }
+
+        public List<SessionModel> GetAllSpotifySessions(int userId)
+        {
+            return _lookup.GetAllSpotifySessionsByUser(userId).Select(s => new SessionModel(s)).ToList();
+        }
+
+        public SessionModel GetSpotifySession(int userId, int sessionId)
+        {
+            var session = _lookup.GetSpotifySessionByUser(userId, sessionId);
+
+            if (session is null)
+                throw new ArgumentNullException("Could not find session with session ID provided!");
+
+            return new SessionModel(session)
+            {
+                TrackPlays = session.SpotifyTrackPlays.Select(tp => new TrackPlayModel(tp)).ToList()
+            };
+        }
     }
 }

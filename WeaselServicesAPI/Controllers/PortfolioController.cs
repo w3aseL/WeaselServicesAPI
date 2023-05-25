@@ -8,6 +8,7 @@ using PortfolioLibrary;
 
 namespace WeaselServicesAPI.Controllers
 {
+    [Route("api/portfolio")]
     public class PortfolioController : Controller
     {
         private CategoryService _categoryService;
@@ -21,13 +22,13 @@ namespace WeaselServicesAPI.Controllers
             _resumeService = new ResumeService(ctx, s3Service);
         }
 
-        [HttpGet, Route("api/portfolio"), Authorize]
+        [HttpGet, Route(""), Authorize]
         public JsonResult GetPortfolio()
         {
             return ResponseHelper.GenerateResponse(new { Message = "UNIMPLEMENTED" }, (int) HttpStatusCode.OK);
         }
 
-        [HttpGet, Route("api/portfolio/category"), Authorize]
+        [HttpGet, Route("category"), Authorize]
         public JsonResult GetCategories()
         {
             try
@@ -42,7 +43,7 @@ namespace WeaselServicesAPI.Controllers
             }
         }
 
-        [HttpPost, Route("api/portfolio/category"), Authorize]
+        [HttpPost, Route("category"), Authorize]
         public JsonResult CreateCategory(CategoryModel model)
         {
             try
@@ -64,7 +65,7 @@ namespace WeaselServicesAPI.Controllers
             }
         }
 
-        [HttpDelete, Route("api/portfolio/category"), Authorize]
+        [HttpDelete, Route("category"), Authorize]
         public JsonResult DeleteCategory(string name)
         {
             try
@@ -85,7 +86,7 @@ namespace WeaselServicesAPI.Controllers
             }
         }
 
-        [HttpGet, Route("api/portfolio/image"), Authorize]
+        [HttpGet, Route("image"), Authorize]
         public JsonResult GetImages()
         {
             try
@@ -100,7 +101,7 @@ namespace WeaselServicesAPI.Controllers
             }
         }
 
-        [HttpGet, Route("api/portfolio/image/:id"), Authorize]
+        [HttpGet, Route("image/{id:guid}"), Authorize]
         public JsonResult GetImage(string id)
         {
             try
@@ -121,7 +122,7 @@ namespace WeaselServicesAPI.Controllers
             }
         }
 
-        [HttpDelete, Route("api/portfolio/image"), Authorize]
+        [HttpDelete, Route("image"), Authorize]
         public async Task<JsonResult> DeleteImage(string id)
         {
             try
@@ -142,7 +143,7 @@ namespace WeaselServicesAPI.Controllers
             }
         }
 
-        [HttpGet, Route("api/portfolio/resume"), Authorize]
+        [HttpGet, Route("resume"), Authorize]
         public JsonResult GetResumes()
         {
             try
@@ -157,7 +158,7 @@ namespace WeaselServicesAPI.Controllers
             }
         }
 
-        [HttpPost, Route("api/portfolio/resume"), Authorize]
+        [HttpPost, Route("resume"), Authorize]
         public async Task<JsonResult> CreateResume(ResumeModel model)
         {
             try
@@ -172,7 +173,7 @@ namespace WeaselServicesAPI.Controllers
             }
         }
 
-        [HttpDelete, Route("api/portfolio/resume/:id"), Authorize]
+        [HttpDelete, Route("resume/{id:guid}"), Authorize]
         public async Task<JsonResult> DeleteResume(string id)
         {
             try

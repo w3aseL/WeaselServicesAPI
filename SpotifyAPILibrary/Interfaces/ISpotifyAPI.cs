@@ -10,5 +10,7 @@ namespace SpotifyAPILibrary
         public Task CompleteAccountRequest(string authCode, string authState, string redirectUrl);
         public SpotifySongModel GetCurrentlyListenedToSong(int userId);
         public SpotifyPlayerStateModel GetPlayerStatus(int userId);
+        public List<SessionModel> GetAllSpotifySessions(int userId);
+        public SessionModel GetSpotifySession(int userId, int sessionId);
     }
 }

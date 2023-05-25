@@ -107,5 +107,25 @@ namespace SpotifyAPILibrary
 
             return account.AccessToken;
         }
+
+        public List<SpotifySession> GetAllSpotifySessionsByUser(int userId)
+        {
+            var account = GetAccountByUserId(userId);
+
+            if (account is null)
+                throw new SpotifyAccountNotFoundException("Could not find Spotify account linked to that user!");
+
+            return _ctx.SpotifySessions.Where(s => s.AccountId == account.SpotifyAuthId).ToList();
+        }
+
+        public SpotifySession GetSpotifySessionByUser(int userId, int sessionId)
+        {
+            var account = GetAccountByUserId(userId);
+
+            if (account is null)
+                throw new SpotifyAccountNotFoundException("Could not find Spotify account linked to that user!");
+
+            return _ctx.SpotifySessions.FirstOrDefault(s => s.AccountId == account.SpotifyAuthId && s.Id == sessionId);
+        }
     }
 }

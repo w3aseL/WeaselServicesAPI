@@ -60,6 +60,7 @@
     <Folder Include="dbo\Tables" />
     <Folder Include="dbo\Stored Procedures" />
     <Folder Include="dbo\Views" />
+    <Folder Include="dbo\Scripts" />
   </ItemGroup>
   <ItemGroup>
     <None Include="dbo\SchemaCompare.scmp" />
@@ -87,5 +88,6 @@
     <Build Include="dbo\Tables\ProjectImage.sql" />
     <Build Include="dbo\Tables\ProjectTool.sql" />
     <Build Include="dbo\Tables\Resume.sql" />
+    <None Include="dbo\Scripts\SpotifyMigration.sql" />
   </ItemGroup>
 </Project>

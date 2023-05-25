@@ -2,6 +2,7 @@ using DataAccessLayer;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Proxies;
 using Microsoft.IdentityModel.Tokens;
 using SpotifyAPILibrary;
 using PortfolioLibrary;
@@ -10,6 +11,8 @@ using WeaselServicesAPI.Helpers;
 using WeaselServicesAPI.Helpers.Interfaces;
 using WeaselServicesAPI.Helpers.JWT;
 using PortfolioLibrary.Services;
+
+const string CORS_POLICY_NAME = "DashboardPolicy";
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -24,7 +27,7 @@ builder.Services.AddSwaggerGen();
 
 // dbcontext
 builder.Services.AddDbContext<ServicesAPIContext>(
-    options => options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
+    options => options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")).UseLazyLoadingProxies());
 
 // email system
 var emailConfig = builder.Configuration.GetSection("EmailSettings").Get<EmailSettings>();
@@ -51,6 +54,24 @@ builder.Services.AddSingleton<S3Service>();
 
 builder.Services.AddDatabaseDeveloperPageExceptionFilter();
 
+builder.Services.AddCors(options =>
+{
+        options.AddPolicy(name: CORS_POLICY_NAME,
+        policy =>
+        {
+            /*
+            policy.WithOrigins(builder.Configuration.GetRequiredSection("AllowedCORSSites").Get<string[]>())
+                .SetIsOriginAllowedToAllowWildcardSubdomains()
+                .WithMethods("GET", "PUT", "POST", "DELETE", "OPTIONS", "PATCH")
+                .AllowAnyHeader()
+                .AllowCredentials();
+            */
+
+            policy.AllowAnyOrigin()
+                .AllowAnyMethod();
+        });
+});
+
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddJwtBearer(
         opt => {
@@ -74,8 +95,9 @@ builder.Services.AddHostedService(provider => provider.GetRequiredService<Spotif
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
-if (app.Environment.IsDevelopment())
+if (app.Environment.IsDevelopment() || app.Environment.EnvironmentName == "QA")
 {
+    app.UseHttpLogging();
     app.UseSwagger();
     app.UseSwaggerUI();
 }
@@ -91,6 +113,8 @@ app.Use(async (context, next) =>
         await context.Response.WriteAsJsonAsync(new { Message = "Token Validation Has Failed. Request Access Denied" });
     }
 });
+
+app.UseCors(CORS_POLICY_NAME);
 
 app.UseAuthentication();
 app.UseAuthorization();

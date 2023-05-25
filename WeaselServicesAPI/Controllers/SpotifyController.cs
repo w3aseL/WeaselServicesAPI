@@ -12,12 +12,12 @@ namespace WeaselServicesAPI.Controllers
     [Route("api/spotify")]
     public class SpotifyController : Controller
     {
-        private readonly SpotifyService _service;
+        private readonly ISpotifyAPI _spotify;
         private readonly ServicesAPIContext _ctx;
 
         public SpotifyController(ISpotifyAPI api, ServicesAPIContext ctx)
         {
-            _service = new SpotifyService(api);
+            _spotify = api;
             _ctx = ctx;
         }
 
@@ -26,7 +26,7 @@ namespace WeaselServicesAPI.Controllers
         {
             try
             {
-                var obj = await _service.GetTestTrack();
+                var obj = await _spotify.GetTrack();
 
                 return ResponseHelper.GenerateResponse(obj, (int) HttpStatusCode.OK);
             }
@@ -50,7 +50,7 @@ namespace WeaselServicesAPI.Controllers
 
                 var userId = _ctx.Users.Where(u => u.Uuid.ToString() == uuid).FirstOrDefault()?.UserId ?? -1;
 
-                var uri = _service.GetNewAccountUri(userId, $"{Request.Scheme}://{Request.Host}/api/spotify/auth");
+                var uri = _spotify.GetAccountRequestUrl(userId, $"{Request.Scheme}://{Request.Host}/api/spotify/auth");
 
                 return ResponseHelper.GenerateResponse(new { url = uri }, (int)HttpStatusCode.Created);
             }
@@ -72,7 +72,7 @@ namespace WeaselServicesAPI.Controllers
                 var code = Request.Query["code"];
                 var state = Request.Query["state"];
 
-                await _service.ConfirmAccountWithCode(code, state, $"{Request.Scheme}://{Request.Host}/api/spotify/auth");
+                await _spotify.CompleteAccountRequest(code, state, $"{Request.Scheme}://{Request.Host}/api/spotify/auth");
 
                 return RedirectToAction("SuccessfulAccountLogin", new { message = "Successfully logged into spotify account! No redirect after login was provided." });
             }
@@ -105,7 +105,7 @@ namespace WeaselServicesAPI.Controllers
 
                 var userId = _ctx.Users.Where(u => u.Uuid.ToString() == uuid).FirstOrDefault()?.UserId ?? -1;
 
-                var obj = _service.GetCurrentlyPlayedSong(userId);
+                var obj = _spotify.GetCurrentlyListenedToSong(userId);
 
                 return ResponseHelper.GenerateResponse(obj, (int)HttpStatusCode.OK);
             }
@@ -129,7 +129,61 @@ namespace WeaselServicesAPI.Controllers
 
                 var userId = _ctx.Users.Where(u => u.Uuid.ToString() == uuid).FirstOrDefault()?.UserId ?? -1;
 
-                var obj = _service.GetPlayerStatus(userId);
+                var obj = _spotify.GetPlayerStatus(userId);
+
+                return ResponseHelper.GenerateResponse(obj, (int)HttpStatusCode.OK);
+            }
+            catch (UserExistsException e)
+            {
+                return ResponseHelper.GenerateResponse(new { Message = e.Message }, (int)HttpStatusCode.BadRequest);
+            }
+            catch (Exception e)
+            {
+                return ResponseHelper.GenerateResponse(new { Message = e.Message }, (int)HttpStatusCode.InternalServerError);
+            }
+        }
+
+        [HttpGet, Route("data/sessions"), Authorize]
+        public JsonResult GetSessions()
+        {
+            try
+            {
+                var identity = HttpContext.User.Identity as ClaimsIdentity;
+                var uuid = identity.FindFirst(ClaimTypes.NameIdentifier).Value;
+
+                var userId = _ctx.Users.Where(u => u.Uuid.ToString() == uuid).FirstOrDefault()?.UserId ?? -1;
+
+                var obj = _spotify.GetAllSpotifySessions(userId);
+
+                return ResponseHelper.GenerateResponse(obj.Select(s => new {
+                    s.SessionId,
+                    s.StartTime,
+                    s.EndTime,
+                    s.SongCount,
+                    s.TimeListening
+                }).ToList(), (int)HttpStatusCode.OK);
+            }
+            catch (UserExistsException e)
+            {
+                return ResponseHelper.GenerateResponse(new { Message = e.Message }, (int)HttpStatusCode.BadRequest);
+            }
+            catch (Exception e)
+            {
+                return ResponseHelper.GenerateResponse(new { Message = e.Message }, (int)HttpStatusCode.InternalServerError);
+            }
+        }
+
+        [HttpGet, Route("data/session/{id:int}"), Authorize]
+        public JsonResult GetSession(int id)
+        {
+            try
+            {
+                var identity = HttpContext.User.Identity as ClaimsIdentity;
+                var uuid = identity.FindFirst(ClaimTypes.NameIdentifier).Value;
+
+                var userId = _ctx.Users.Where(u => u.Uuid.ToString() == uuid).FirstOrDefault()?.UserId ?? -1;
+
+                var obj = _spotify.GetSpotifySession(userId, id);
 
                 return ResponseHelper.GenerateResponse(obj, (int)HttpStatusCode.OK);
             }

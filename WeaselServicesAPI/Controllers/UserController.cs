@@ -1,5 +1,6 @@
 ﻿using DataAccessLayer;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System.Net;
@@ -10,6 +11,7 @@ using WeaselServicesAPI.Services;
 
 namespace WeaselServicesAPI.Controllers
 {
+    [EnableCors("DashboardPolicy")]
     [Route("api/user")]
     [ApiController]
     public class UserController : ControllerBase
