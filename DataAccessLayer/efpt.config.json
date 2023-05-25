@@ -1,0 +1,137 @@
+﻿{
+   "CodeGenerationMode": 2,
+   "ContextClassName": "ServicesAPIContext",
+   "ContextNamespace": null,
+   "DefaultDacpacSchema": null,
+   "FilterSchemas": false,
+   "IncludeConnectionString": false,
+   "ModelNamespace": null,
+   "OutputContextPath": ".",
+   "OutputPath": "Models",
+   "PreserveCasingWithRegex": true,
+   "ProjectRootNamespace": "DataAccessLayer",
+   "Schemas": null,
+   "SelectedHandlebarsLanguage": 0,
+   "SelectedToBeGenerated": 0,
+   "Tables": [
+      {
+         "Name": "[dbo].[BlacklistedToken]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[dbo].[Category]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[dbo].[Education]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[dbo].[Image]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[dbo].[Permission]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[dbo].[Position]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[dbo].[Project]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[dbo].[ProjectImage]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[dbo].[ProjectTool]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[dbo].[Resume]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[dbo].[Role]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[dbo].[RolePermission]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[dbo].[SpotifyAccount]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[dbo].[SpotifyAccountRequest]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[dbo].[SpotifyAlbum]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[dbo].[SpotifyArtist]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[dbo].[SpotifyArtistAlbum]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[dbo].[SpotifySession]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[dbo].[SpotifySong]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[dbo].[SpotifySongAlbum]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[dbo].[SpotifySongArtists]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[dbo].[SpotifyTrackPlay]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[dbo].[Tool]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[dbo].[User]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[dbo].[UserAccountRequest]",
+         "ObjectType": 0
+      }
+   ],
+   "UiHint": "..\\Database\\Database.sqlproj",
+   "UncountableWords": null,
+   "UseBoolPropertiesWithoutDefaultSql": false,
+   "UseDatabaseNames": false,
+   "UseDateOnlyTimeOnly": false,
+   "UseDbContextSplitting": false,
+   "UseFluentApiOnly": true,
+   "UseHandleBars": false,
+   "UseHierarchyId": false,
+   "UseInflector": true,
+   "UseLegacyPluralizer": false,
+   "UseManyToManyEntity": false,
+   "UseNoDefaultConstructor": false,
+   "UseNoObjectFilter": false,
+   "UseNodaTime": false,
+   "UseNullableReferences": false,
+   "UseSchemaFolders": false,
+   "UseSpatial": false,
+   "UseT4": false
+}

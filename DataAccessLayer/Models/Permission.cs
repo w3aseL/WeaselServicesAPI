@@ -5,16 +5,16 @@ using System.Collections.Generic;
 
 namespace DataAccessLayer.Models
 {
-    public partial class Category
+    public partial class Permission
     {
-        public Category()
+        public Permission()
         {
-            Tools = new HashSet<Tool>();
+            Roles = new HashSet<Role>();
         }
 
-        public int Id { get; set; }
+        public int PermissionId { get; set; }
         public string Name { get; set; }
 
-        public virtual ICollection<Tool> Tools { get; set; }
+        public virtual ICollection<Role> Roles { get; set; }
     }
 }

@@ -64,6 +64,7 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="dbo\SchemaCompare.scmp" />
+    <None Include="dbo\Scripts\SEED.sql" />
   </ItemGroup>
   <ItemGroup>
     <Build Include="dbo\Tables\User.sql" />
@@ -89,5 +90,8 @@
     <Build Include="dbo\Tables\ProjectTool.sql" />
     <Build Include="dbo\Tables\Resume.sql" />
     <None Include="dbo\Scripts\SpotifyMigration.sql" />
+    <Build Include="dbo\Tables\Permission.sql" />
+    <Build Include="dbo\Tables\Role.sql" />
+    <Build Include="dbo\Tables\RolePermission.sql" />
   </ItemGroup>
 </Project>
