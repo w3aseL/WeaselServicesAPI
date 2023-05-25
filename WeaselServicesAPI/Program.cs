@@ -11,6 +11,7 @@ using WeaselServicesAPI.Helpers;
 using WeaselServicesAPI.Helpers.Interfaces;
 using WeaselServicesAPI.Helpers.JWT;
 using PortfolioLibrary.Services;
+using EmailService;
 
 const string CORS_POLICY_NAME = "DashboardPolicy";
 

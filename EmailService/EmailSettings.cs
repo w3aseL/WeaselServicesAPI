@@ -1,4 +1,4 @@
-﻿namespace WeaselServicesAPI.Configuration
+﻿namespace EmailService
 {
     public class EmailSettings
     {

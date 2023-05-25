@@ -1,6 +1,6 @@
 ﻿using MimeKit;
 
-namespace WeaselServicesAPI.Models
+namespace EmailService.Models
 {
     public class Message
     {

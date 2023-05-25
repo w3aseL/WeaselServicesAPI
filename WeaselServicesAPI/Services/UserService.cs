@@ -1,10 +1,11 @@
 ﻿using DataAccessLayer;
 using DataAccessLayer.Models;
+using EmailService;
+using EmailService.Models;
 using WeaselServicesAPI.Exceptions;
 using WeaselServicesAPI.Helpers;
 using WeaselServicesAPI.Helpers.Interfaces;
 using WeaselServicesAPI.Helpers.JWT;
-using WeaselServicesAPI.Models;
 
 namespace WeaselServicesAPI.Services
 {

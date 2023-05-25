@@ -1,9 +1,8 @@
-﻿using MailKit.Net.Smtp;
+﻿using EmailService.Models;
+using MailKit.Net.Smtp;
 using MimeKit;
-using WeaselServicesAPI.Configuration;
-using WeaselServicesAPI.Models;
 
-namespace WeaselServicesAPI.Helpers
+namespace EmailService
 {
     public class EmailSender : IEmailSender
     {

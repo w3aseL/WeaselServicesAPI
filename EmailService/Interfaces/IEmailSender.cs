@@ -1,6 +1,6 @@
-﻿using WeaselServicesAPI.Models;
+﻿using EmailService.Models;
 
-namespace WeaselServicesAPI.Helpers
+namespace EmailService
 {
     public interface IEmailSender
     {
