@@ -203,6 +203,7 @@ namespace SpotifyAPILibrary
     {
         public bool IsPlaying { get; set; }
         public bool IsSessionActive { get; set; }
+        public DateTime StartTime { get; set; }
         public SpotifySongModel CurrentSong { get; set; }
         public SpotifySongModel PreviousSong { get; set; }
         public List<SpotifySessionSongRecord> SongList { get; set; }
@@ -217,6 +218,7 @@ namespace SpotifyAPILibrary
             CurrentSong = state.CurrentSong;
             PreviousSong = state.PreviousSong;
             SongList = state.SongList;
+            StartTime = state.SessionStartTime;
             TimeInactive = state.GetTimeInactive();
             SessionLength = state.GetSessionTime();
             SongPositionMs = state.GetActiveSongTime();

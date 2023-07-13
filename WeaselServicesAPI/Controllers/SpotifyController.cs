@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using SpotifyAPILibrary;
+using System.Data.SqlTypes;
 using System.Net;
 using System.Security.Claims;
 using WeaselServicesAPI.Exceptions;
@@ -190,6 +191,81 @@ namespace WeaselServicesAPI.Controllers
             catch (UserExistsException e)
             {
                 return ResponseHelper.GenerateResponse(new { Message = e.Message }, (int)HttpStatusCode.BadRequest);
+            }
+            catch (Exception e)
+            {
+                return ResponseHelper.GenerateResponse(new { Message = e.Message }, (int)HttpStatusCode.InternalServerError);
+            }
+        }
+
+        [HttpGet, Route("data/songs"), Authorize]
+        public JsonResult GetSongs()
+        {
+            try
+            {
+                var obj = _spotify.GetAllSongs();
+
+                return ResponseHelper.GenerateResponse(obj, (int)HttpStatusCode.OK);
+            }
+            catch (Exception e)
+            {
+                return ResponseHelper.GenerateResponse(new { Message = e.Message }, (int)HttpStatusCode.InternalServerError);
+            }
+        }
+
+        [HttpGet, Route("data/song/{id}"), Authorize]
+        public JsonResult GetSong(string id)
+        {
+            try
+            {
+                var obj = _spotify.GetSong(id);
+
+                return ResponseHelper.GenerateResponse(obj, (int)HttpStatusCode.OK);
+            }
+            catch (Exception e)
+            {
+                return ResponseHelper.GenerateResponse(new { Message = e.Message }, (int)HttpStatusCode.InternalServerError);
+            }
+        }
+
+        [HttpGet, Route("stats/songs"), Authorize]
+        public JsonResult GetSongStatistics()
+        {
+            try
+            {
+                var obj = _spotify.GetSongStatistics(SqlDateTime.MinValue.Value, DateTime.Now);
+
+                return ResponseHelper.GenerateResponse(obj, (int)HttpStatusCode.OK);
+            }
+            catch (Exception e)
+            {
+                return ResponseHelper.GenerateResponse(new { Message = e.Message }, (int)HttpStatusCode.InternalServerError);
+            }
+        }
+
+        [HttpGet, Route("stats/artists"), Authorize]
+        public JsonResult GetArtistStatistics()
+        {
+            try
+            {
+                var obj = _spotify.GetArtistStatistics(SqlDateTime.MinValue.Value, DateTime.Now);
+
+                return ResponseHelper.GenerateResponse(obj, (int)HttpStatusCode.OK);
+            }
+            catch (Exception e)
+            {
+                return ResponseHelper.GenerateResponse(new { Message = e.Message }, (int)HttpStatusCode.InternalServerError);
+            }
+        }
+
+        [HttpGet, Route("stats/albums"), Authorize]
+        public JsonResult GetAlbumStatistics()
+        {
+            try
+            {
+                var obj = _spotify.GetAlbumStatistics(SqlDateTime.MinValue.Value, DateTime.Now);
+
+                return ResponseHelper.GenerateResponse(obj, (int)HttpStatusCode.OK);
             }
             catch (Exception e)
             {

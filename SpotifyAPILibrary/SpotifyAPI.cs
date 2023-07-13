@@ -84,5 +84,68 @@ namespace SpotifyAPILibrary
                 TrackPlays = session.SpotifyTrackPlays.Select(tp => new TrackPlayModel(tp)).ToList()
             };
         }
+
+        public List<SpotifySongModel> GetAllSongs()
+        {
+            return _lookup.GetAllSpotifySongs().Select(song => new SpotifySongModel(song)).ToList();
+        }
+
+        public SpotifySongModel GetSong(string songId)
+        {
+            var song = _lookup.GetSpotifySong(songId);
+
+            return song != null ? new SpotifySongModel(song) : new SpotifySongModel();
+        }
+
+        public List<SpotifyArtistModel> GetAllArtists()
+        {
+            return _lookup.GetAllSpotifyArtists().Select(artist => new SpotifyArtistModel(artist)).ToList();
+        }
+
+        public SpotifyArtistModel GetArtist(string artistId)
+        {
+            var artist = _lookup.GetSpotifyArtist(artistId);
+
+            return artist != null ? new SpotifyArtistModel(artist) : new SpotifyArtistModel();
+        }
+
+        public List<SpotifySongStatisticModel> GetSongStatistics(DateTime? startDate, DateTime? endDate, int offset = 0, int? limit = null)
+        {
+            var trackPlays = _lookup.GetTrackPlaysInRange(startDate, endDate);
+
+            return trackPlays.GroupBy(tp => tp.Song.Title)
+                .Select(g => new SpotifySongStatisticModel
+                {
+                    TimesPlayed = g.Count(),
+                    TimeListening = g.Sum(s => s.TimePlayed),
+                    Song = new SpotifySongModel(g.First().Song)
+                }).OrderByDescending(m => m.TimesPlayed).ThenByDescending(m => m.TimeListening).ToList();
+        }
+
+        public List<SpotifyArtistStatisticModel> GetArtistStatistics(DateTime? startDate, DateTime? endDate, int offset = 0, int? limit = null)
+        {
+            var trackPlays = _lookup.GetTrackPlaysInRange(startDate, endDate);
+
+            return trackPlays.GroupBy(tp => tp.Song.SpotifySongArtists.First().Artist)
+                .Select(g => new SpotifyArtistStatisticModel
+                {
+                    TimesPlayed = g.Count(),
+                    TimeListening = g.Sum(s => s.TimePlayed),
+                    Artist = new SpotifyArtistModel(g.First().Song.SpotifySongArtists.First().Artist)
+                }).OrderByDescending(m => m.TimesPlayed).ThenByDescending(m => m.TimeListening).ToList();
+        }
+
+        public List<SpotifyAlbumStatisticModel> GetAlbumStatistics(DateTime? startDate, DateTime? endDate, int offset = 0, int? limit = null)
+        {
+            var trackPlays = _lookup.GetTrackPlaysInRange(startDate, endDate);
+
+            return trackPlays.Where(tp => tp.Song.SpotifySongAlbums.Any()).GroupBy(tp => tp.Song.SpotifySongAlbums.First().Album.Title)
+                .Select(g => new SpotifyAlbumStatisticModel
+                {
+                    TimesPlayed = g.Count(),
+                    TimeListening = g.Sum(s => s.TimePlayed),
+                    Album = new SpotifyAlbumModel(g.First().Song.SpotifySongAlbums.First().Album)
+                }).OrderByDescending(m => m.TimesPlayed).ThenByDescending(m => m.TimeListening).ToList();
+        }
     }
 }

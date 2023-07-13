@@ -21,14 +21,14 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Logging.ClearProviders();
 builder.Logging.AddConsole();
 
-builder.Services.AddControllers();
+builder.Services.AddControllersWithViews();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
 // dbcontext
 builder.Services.AddDbContext<ServicesAPIContext>(
-    options => options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")).UseLazyLoadingProxies());
+    options => options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
 // email system
 var emailConfig = builder.Configuration.GetSection("EmailSettings").Get<EmailSettings>();
@@ -69,7 +69,8 @@ builder.Services.AddCors(options =>
             */
 
             policy.AllowAnyOrigin()
-                .AllowAnyMethod();
+                .AllowAnyMethod()
+                .AllowAnyHeader();
         });
 });
 

@@ -125,6 +125,27 @@ namespace SpotifyAPILibrary.Models
         }
     }
 
+    public class SpotifyStatisticModel
+    {
+        public int TimesPlayed { get; set; }
+        public int TimeListening { get; set; }
+    }
+
+    public class SpotifySongStatisticModel : SpotifyStatisticModel
+    {
+        public SpotifySongModel Song { get; set; }
+    }
+
+    public class SpotifyArtistStatisticModel : SpotifyStatisticModel
+    {
+        public SpotifyArtistModel Artist { get; set; }
+    }
+
+    public class SpotifyAlbumStatisticModel : SpotifyStatisticModel
+    {
+        public SpotifyAlbumModel Album { get; set; }
+    }
+
     public static class SpotifyUriTranslator
     {
         public static string ConvertUriToHref(string uri)
