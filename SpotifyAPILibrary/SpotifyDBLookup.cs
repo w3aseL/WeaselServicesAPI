@@ -109,14 +109,22 @@ namespace SpotifyAPILibrary
             return account.AccessToken;
         }
 
-        public List<SpotifySession> GetAllSpotifySessionsByUser(int userId)
+        public (int, List<SpotifySession>) GetAllSpotifySessionsByUser(int userId, int offset=0, int? limit=null)
         {
             var account = GetAccountByUserId(userId);
 
             if (account is null)
                 throw new SpotifyAccountNotFoundException("Could not find Spotify account linked to that user!");
 
-            return _ctx.SpotifySessions.Where(s => s.AccountId == account.SpotifyAuthId).ToList();
+            var totalNumSessions = _ctx.SpotifySessions.Count();
+
+            var sessions = _ctx.SpotifySessions
+                .Where(s => s.AccountId == account.SpotifyAuthId)
+                .Skip(offset);
+
+            if (limit.HasValue) sessions = sessions.Take(limit.Value);
+
+            return (totalNumSessions, sessions.ToList());
         }
 
         public SpotifySession GetSpotifySessionByUser(int userId, int sessionId)
@@ -140,13 +148,15 @@ namespace SpotifyAPILibrary
                 .FirstOrDefault();
         }
 
-        public List<SpotifySong> GetAllSpotifySongs(int offset=0, int? limit=null)
+        public (int, List<SpotifySong>) GetAllSpotifySongs(int offset=0, int? limit=null)
         {
+            var count = _ctx.SpotifySongs.Count();
+
             var pagedThrough = _ctx.SpotifySongs.Skip(offset);
 
             if (limit.HasValue) pagedThrough = pagedThrough.Take(limit.Value);
 
-            return pagedThrough
+            return (count, pagedThrough
                 .Include(s => s.SpotifySongArtists)
                 .Include(s => s.SpotifySongArtists)
                 .ThenInclude(sa => sa.Artist)
@@ -154,7 +164,7 @@ namespace SpotifyAPILibrary
                 .ThenInclude(sa => sa.Album)
                 .ThenInclude(a => a.SpotifyArtistAlbums)
                 .ThenInclude(aa => aa.Artist)
-                .ToList();
+                .ToList());
         }
 
         public SpotifySong GetSpotifySong(string songId)
@@ -184,7 +194,7 @@ namespace SpotifyAPILibrary
             return _ctx.SpotifyArtists.FirstOrDefault(s => s.Id == artistId);
         }
 
-        public List<SpotifyTrackPlay> GetTrackPlaysInRange(DateTime? startDate, DateTime? endDate)
+        public IQueryable<SpotifyTrackPlay> GetTrackPlaysInRange(DateTime? startDate, DateTime? endDate)
         {
             return _ctx.SpotifyTrackPlays.Where(tp => tp.Session.StartTime >= startDate || tp.Session.StartTime <= endDate
                 || tp.Session.StartTime <= endDate || tp.Session.EndTime <= endDate)
@@ -194,8 +204,7 @@ namespace SpotifyAPILibrary
                     .Include(tp => tp.Song.SpotifySongAlbums)
                     .ThenInclude(sa => sa.Album)
                     .ThenInclude(a => a.SpotifyArtistAlbums)
-                    .ThenInclude(aa => aa.Artist)
-                    .ToList();
+                    .ThenInclude(aa => aa.Artist);
         }
     }
 }

@@ -67,9 +67,11 @@ namespace SpotifyAPILibrary
             return _stateManager.GetActiveState(accountId).SerializePlayerState();
         }
 
-        public List<SessionModel> GetAllSpotifySessions(int userId)
+        public (int, List<SessionModel>) GetAllSpotifySessions(int userId, int offset=0, int? limit=null)
         {
-            return _lookup.GetAllSpotifySessionsByUser(userId).Select(s => new SessionModel(s)).ToList();
+            var (total, sessions) = _lookup.GetAllSpotifySessionsByUser(userId, offset, limit);
+
+            return (total, sessions.Select(s => new SessionModel(s)).ToList());
         }
 
         public SessionModel GetSpotifySession(int userId, int sessionId)
@@ -85,9 +87,11 @@ namespace SpotifyAPILibrary
             };
         }
 
-        public List<SpotifySongModel> GetAllSongs()
+        public (int, List<SpotifySongModel>) GetAllSongs(int offset = 0, int? limit = null)
         {
-            return _lookup.GetAllSpotifySongs().Select(song => new SpotifySongModel(song)).ToList();
+            var (total, songs) = _lookup.GetAllSpotifySongs(offset, limit);
+
+            return (total, songs.Select(song => new SpotifySongModel(song)).ToList());
         }
 
         public SpotifySongModel GetSong(string songId)
@@ -109,43 +113,76 @@ namespace SpotifyAPILibrary
             return artist != null ? new SpotifyArtistModel(artist) : new SpotifyArtistModel();
         }
 
-        public List<SpotifySongStatisticModel> GetSongStatistics(DateTime? startDate, DateTime? endDate, int offset = 0, int? limit = null)
+        public (int, List<SpotifySongStatisticModel>) GetSongStatistics(DateTime? startDate, DateTime? endDate, int offset = 0, int? limit = null)
         {
             var trackPlays = _lookup.GetTrackPlaysInRange(startDate, endDate);
 
-            return trackPlays.GroupBy(tp => tp.Song.Title)
+            var tpQueryable = trackPlays.GroupBy(tp => tp.Song.Title)
                 .Select(g => new SpotifySongStatisticModel
                 {
                     TimesPlayed = g.Count(),
                     TimeListening = g.Sum(s => s.TimePlayed),
                     Song = new SpotifySongModel(g.First().Song)
-                }).OrderByDescending(m => m.TimesPlayed).ThenByDescending(m => m.TimeListening).ToList();
+                })
+                .OrderByDescending(m => m.TimesPlayed)
+                .ThenByDescending(m => m.TimeListening);
+
+            var count = tpQueryable.Count();
+
+            var queryable = tpQueryable
+                .Skip(offset);
+
+            if (limit.HasValue) queryable = queryable.Take(limit.Value);
+
+            return (count, queryable.ToList());
         }
 
-        public List<SpotifyArtistStatisticModel> GetArtistStatistics(DateTime? startDate, DateTime? endDate, int offset = 0, int? limit = null)
+        public (int, List<SpotifyArtistStatisticModel>) GetArtistStatistics(DateTime? startDate, DateTime? endDate, int offset = 0, int? limit = null)
         {
-            var trackPlays = _lookup.GetTrackPlaysInRange(startDate, endDate);
+            var trackPlays = _lookup.GetTrackPlaysInRange(startDate, endDate).ToList();
 
-            return trackPlays.GroupBy(tp => tp.Song.SpotifySongArtists.First().Artist)
+            var tpQueryable = trackPlays.GroupBy(tp => tp.Song.SpotifySongArtists.First().Artist)
                 .Select(g => new SpotifyArtistStatisticModel
                 {
                     TimesPlayed = g.Count(),
                     TimeListening = g.Sum(s => s.TimePlayed),
                     Artist = new SpotifyArtistModel(g.First().Song.SpotifySongArtists.First().Artist)
-                }).OrderByDescending(m => m.TimesPlayed).ThenByDescending(m => m.TimeListening).ToList();
+                })
+                .OrderByDescending(m => m.TimesPlayed)
+                .ThenByDescending(m => m.TimeListening);
+
+            var count = tpQueryable.Count();
+
+            var queryable = tpQueryable
+                .Skip(offset);
+
+            if (limit.HasValue) queryable = queryable.Take(limit.Value);
+
+            return (count, queryable.ToList());
         }
 
-        public List<SpotifyAlbumStatisticModel> GetAlbumStatistics(DateTime? startDate, DateTime? endDate, int offset = 0, int? limit = null)
+        public (int, List<SpotifyAlbumStatisticModel>) GetAlbumStatistics(DateTime? startDate, DateTime? endDate, int offset = 0, int? limit = null)
         {
-            var trackPlays = _lookup.GetTrackPlaysInRange(startDate, endDate);
+            var trackPlays = _lookup.GetTrackPlaysInRange(startDate, endDate).ToList();
 
-            return trackPlays.Where(tp => tp.Song.SpotifySongAlbums.Any()).GroupBy(tp => tp.Song.SpotifySongAlbums.First().Album.Title)
+            var tpQueryable = trackPlays.Where(tp => tp.Song.SpotifySongAlbums.Any()).GroupBy(tp => tp.Song.SpotifySongAlbums.First().Album.Title)
                 .Select(g => new SpotifyAlbumStatisticModel
                 {
                     TimesPlayed = g.Count(),
                     TimeListening = g.Sum(s => s.TimePlayed),
                     Album = new SpotifyAlbumModel(g.First().Song.SpotifySongAlbums.First().Album)
-                }).OrderByDescending(m => m.TimesPlayed).ThenByDescending(m => m.TimeListening).ToList();
+                })
+                .OrderByDescending(m => m.TimesPlayed)
+                .ThenByDescending(m => m.TimeListening);
+
+            var count = tpQueryable.Count();
+
+            var queryable = tpQueryable
+                .Skip(offset);
+
+            if (limit.HasValue) queryable = queryable.Take(limit.Value);
+
+            return (count, queryable.ToList());
         }
     }
 }

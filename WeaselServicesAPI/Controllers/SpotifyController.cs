@@ -1,6 +1,7 @@
 ﻿using DataAccessLayer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using SpotifyAPI.Web;
 using SpotifyAPILibrary;
 using System.Data.SqlTypes;
 using System.Net;
@@ -145,7 +146,7 @@ namespace WeaselServicesAPI.Controllers
         }
 
         [HttpGet, Route("data/sessions"), Authorize]
-        public JsonResult GetSessions()
+        public JsonResult GetSessions([FromQuery] PagingParams paging)
         {
             try
             {
@@ -154,15 +155,25 @@ namespace WeaselServicesAPI.Controllers
 
                 var userId = _ctx.Users.Where(u => u.Uuid.ToString() == uuid).FirstOrDefault()?.UserId ?? -1;
 
-                var obj = _spotify.GetAllSpotifySessions(userId);
+                var (count, obj) = _spotify.GetAllSpotifySessions(userId, paging.Offset, paging.Limit);
 
-                return ResponseHelper.GenerateResponse(obj.Select(s => new {
-                    s.SessionId,
-                    s.StartTime,
-                    s.EndTime,
-                    s.SongCount,
-                    s.TimeListening
-                }).ToList(), (int)HttpStatusCode.OK);
+                var prevOffset = paging.Limit.HasValue && paging.Offset - paging.Limit >= 0 ? paging.Offset + paging.Limit : null;
+                var nextOffset = paging.Limit.HasValue && paging.Offset + paging.Limit < count ? paging.Offset + paging.Limit : null;
+
+                return ResponseHelper.GenerateResponse(new
+                {
+                    TotalCount = count,
+                    Sessions = obj.Select(s => new {
+                        s.SessionId,
+                        s.StartTime,
+                        s.EndTime,
+                        s.SongCount,
+                        s.TimeListening
+                    }).ToList(),
+                    PrevOffset = prevOffset,
+                    NextOffset = nextOffset,
+                    Limit = paging.Limit
+                }, (int)HttpStatusCode.OK);
             }
             catch (UserExistsException e)
             {
@@ -199,13 +210,23 @@ namespace WeaselServicesAPI.Controllers
         }
 
         [HttpGet, Route("data/songs"), Authorize]
-        public JsonResult GetSongs()
+        public JsonResult GetSongs([FromQuery] PagingParams paging)
         {
             try
             {
-                var obj = _spotify.GetAllSongs();
+                var (count, obj) = _spotify.GetAllSongs(paging.Offset, paging.Limit);
 
-                return ResponseHelper.GenerateResponse(obj, (int)HttpStatusCode.OK);
+                var prevOffset = paging.Limit.HasValue && paging.Offset - paging.Limit >= 0 ? paging.Offset + paging.Limit : null;
+                var nextOffset = paging.Limit.HasValue && paging.Offset + paging.Limit < count ? paging.Offset + paging.Limit : null;
+
+                return ResponseHelper.GenerateResponse(new
+                {
+                    TotalCount = count,
+                    Songs = obj,
+                    PrevOffset = prevOffset,
+                    NextOffset = nextOffset,
+                    Limit = paging.Limit
+                }, (int)HttpStatusCode.OK);
             }
             catch (Exception e)
             {
@@ -229,13 +250,23 @@ namespace WeaselServicesAPI.Controllers
         }
 
         [HttpGet, Route("stats/songs"), Authorize]
-        public JsonResult GetSongStatistics()
+        public JsonResult GetSongStatistics([FromQuery] PagingParams paging)
         {
             try
             {
-                var obj = _spotify.GetSongStatistics(SqlDateTime.MinValue.Value, DateTime.Now);
+                var (count, obj) = _spotify.GetSongStatistics(SqlDateTime.MinValue.Value, DateTime.Now, paging.Offset, paging.Limit);
 
-                return ResponseHelper.GenerateResponse(obj, (int)HttpStatusCode.OK);
+                var prevOffset = paging.Limit.HasValue && paging.Offset - paging.Limit >= 0 ? paging.Offset + paging.Limit : null;
+                var nextOffset = paging.Limit.HasValue && paging.Offset + paging.Limit < count ? paging.Offset + paging.Limit : null;
+
+                return ResponseHelper.GenerateResponse(new
+                {
+                    TotalCount = count,
+                    Statistics = obj,
+                    PrevOffset = prevOffset,
+                    NextOffset = nextOffset,
+                    Limit = paging.Limit
+                }, (int)HttpStatusCode.OK);
             }
             catch (Exception e)
             {
@@ -244,13 +275,23 @@ namespace WeaselServicesAPI.Controllers
         }
 
         [HttpGet, Route("stats/artists"), Authorize]
-        public JsonResult GetArtistStatistics()
+        public JsonResult GetArtistStatistics([FromQuery] PagingParams paging)
         {
             try
             {
-                var obj = _spotify.GetArtistStatistics(SqlDateTime.MinValue.Value, DateTime.Now);
+                var (count, obj) = _spotify.GetArtistStatistics(SqlDateTime.MinValue.Value, DateTime.Now, paging.Offset, paging.Limit);
 
-                return ResponseHelper.GenerateResponse(obj, (int)HttpStatusCode.OK);
+                var prevOffset = paging.Limit.HasValue && paging.Offset - paging.Limit >= 0 ? paging.Offset + paging.Limit : null;
+                var nextOffset = paging.Limit.HasValue && paging.Offset + paging.Limit < count ? paging.Offset + paging.Limit : null;
+
+                return ResponseHelper.GenerateResponse(new
+                {
+                    TotalCount = count,
+                    Statistics = obj,
+                    PrevOffset = prevOffset,
+                    NextOffset = nextOffset,
+                    Limit = paging.Limit
+                }, (int)HttpStatusCode.OK);
             }
             catch (Exception e)
             {
@@ -259,13 +300,23 @@ namespace WeaselServicesAPI.Controllers
         }
 
         [HttpGet, Route("stats/albums"), Authorize]
-        public JsonResult GetAlbumStatistics()
+        public JsonResult GetAlbumStatistics([FromQuery] PagingParams paging)
         {
             try
             {
-                var obj = _spotify.GetAlbumStatistics(SqlDateTime.MinValue.Value, DateTime.Now);
+                var (count, obj) = _spotify.GetAlbumStatistics(SqlDateTime.MinValue.Value, DateTime.Now, paging.Offset, paging.Limit);
 
-                return ResponseHelper.GenerateResponse(obj, (int)HttpStatusCode.OK);
+                var prevOffset = paging.Limit.HasValue && paging.Offset - paging.Limit >= 0 ? paging.Offset + paging.Limit : null;
+                var nextOffset = paging.Limit.HasValue && paging.Offset + paging.Limit < count ? paging.Offset + paging.Limit : null;
+
+                return ResponseHelper.GenerateResponse(new
+                {
+                    TotalCount = count,
+                    Statistics = obj,
+                    PrevOffset = prevOffset,
+                    NextOffset = nextOffset,
+                    Limit = paging.Limit
+                }, (int)HttpStatusCode.OK);
             }
             catch (Exception e)
             {
