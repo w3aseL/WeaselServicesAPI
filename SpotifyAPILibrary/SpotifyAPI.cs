@@ -35,6 +35,8 @@ namespace SpotifyAPILibrary
             return new SpotifySongModel(track);
         }
 
+        #region Account
+
         public Uri GetAccountRequestUrl(int userId, string redirectUrl)
         {
             var loginRequest = _lookup.CreateAccountRequest(userId, _settings.ClientId, redirectUrl);
@@ -46,6 +48,10 @@ namespace SpotifyAPILibrary
         {
             await _lookup.SetupAccountWithCode(authCode, authState, _settings.ClientId, _settings.ClientSecret, redirectUrl);
         }
+
+        #endregion
+
+        #region Player
 
         public SpotifySongModel GetCurrentlyListenedToSong(int userId)
         {
@@ -67,6 +73,10 @@ namespace SpotifyAPILibrary
             return _stateManager.GetActiveState(accountId).SerializePlayerState();
         }
 
+        #endregion
+
+        #region Sessions
+
         public (int, List<SessionModel>) GetAllSpotifySessions(int userId, int offset=0, int? limit=null)
         {
             var (total, sessions) = _lookup.GetAllSpotifySessionsByUser(userId, offset, limit);
@@ -87,6 +97,15 @@ namespace SpotifyAPILibrary
             };
         }
 
+        public List<SessionModel> GetRecentSessions(int userId)
+        {
+            return _lookup.GetRecentSpotifySessions(userId).Select(s => new SessionModel(s)).ToList();
+        }
+
+        #endregion
+
+        #region Session
+
         public (int, List<SpotifySongModel>) GetAllSongs(int offset = 0, int? limit = null)
         {
             var (total, songs) = _lookup.GetAllSpotifySongs(offset, limit);
@@ -101,6 +120,10 @@ namespace SpotifyAPILibrary
             return song != null ? new SpotifySongModel(song) : new SpotifySongModel();
         }
 
+        #endregion
+
+        #region Artists
+
         public List<SpotifyArtistModel> GetAllArtists()
         {
             return _lookup.GetAllSpotifyArtists().Select(artist => new SpotifyArtistModel(artist)).ToList();
@@ -112,6 +135,10 @@ namespace SpotifyAPILibrary
 
             return artist != null ? new SpotifyArtistModel(artist) : new SpotifyArtistModel();
         }
+
+        #endregion
+
+        #region Statistics
 
         public (int, List<SpotifySongStatisticModel>) GetSongStatistics(DateTime? startDate, DateTime? endDate, int offset = 0, int? limit = null)
         {
@@ -184,5 +211,7 @@ namespace SpotifyAPILibrary
 
             return (count, queryable.ToList());
         }
+
+        #endregion
     }
 }

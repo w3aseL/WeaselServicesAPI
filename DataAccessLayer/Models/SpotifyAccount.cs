@@ -3,24 +3,25 @@
 using System;
 using System.Collections.Generic;
 
-namespace DataAccessLayer.Models
+namespace DataAccessLayer.Models;
+
+public partial class SpotifyAccount
 {
-    public partial class SpotifyAccount
-    {
-        public SpotifyAccount()
-        {
-            SpotifySessions = new HashSet<SpotifySession>();
-        }
+    public int SpotifyAuthId { get; set; }
 
-        public int SpotifyAuthId { get; set; }
-        public int UserId { get; set; }
-        public string AccessToken { get; set; }
-        public DateTime AccessGeneratedDate { get; set; }
-        public string RefreshToken { get; set; }
-        public DateTime RefreshGeneratedDate { get; set; }
-        public int ExpiresIn { get; set; }
+    public int UserId { get; set; }
 
-        public virtual User User { get; set; }
-        public virtual ICollection<SpotifySession> SpotifySessions { get; set; }
-    }
+    public string AccessToken { get; set; }
+
+    public DateTime AccessGeneratedDate { get; set; }
+
+    public string RefreshToken { get; set; }
+
+    public DateTime RefreshGeneratedDate { get; set; }
+
+    public int ExpiresIn { get; set; }
+
+    public virtual ICollection<SpotifySession> SpotifySessions { get; set; } = new List<SpotifySession>();
+
+    public virtual User User { get; set; }
 }

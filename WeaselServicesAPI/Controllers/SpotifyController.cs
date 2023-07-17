@@ -6,6 +6,7 @@ using SpotifyAPILibrary;
 using System.Data.SqlTypes;
 using System.Net;
 using System.Security.Claims;
+using WeaselServicesAPI;
 using WeaselServicesAPI.Exceptions;
 using WeaselServicesAPI.Services;
 
@@ -202,6 +203,28 @@ namespace WeaselServicesAPI.Controllers
             catch (UserExistsException e)
             {
                 return ResponseHelper.GenerateResponse(new { Message = e.Message }, (int)HttpStatusCode.BadRequest);
+            }
+            catch (Exception e)
+            {
+                return ResponseHelper.GenerateResponse(new { Message = e.Message }, (int)HttpStatusCode.InternalServerError);
+            }
+        }
+
+        [HttpGet, Route("data/sessions/recent"), Authorize]
+        public JsonResult GetRecentSessions()
+        {
+            var identity = HttpContext.User.Identity as ClaimsIdentity;
+            var uuid = identity.FindFirst(ClaimTypes.NameIdentifier).Value;
+            var userId = _ctx.Users.Where(u => u.Uuid.ToString() == uuid).FirstOrDefault()?.UserId ?? -1;
+
+            var obj = _spotify.GetRecentSessions(userId);
+
+            try {
+                return ResponseHelper.GenerateResponse(obj, (int)HttpStatusCode.OK);
+            }
+            catch (UserExistsException e)
+            {
+                return ResponseHelper.GenerateResponse(new { Message = e.Message }, (int) HttpStatusCode.BadRequest);
             }
             catch (Exception e)
             {

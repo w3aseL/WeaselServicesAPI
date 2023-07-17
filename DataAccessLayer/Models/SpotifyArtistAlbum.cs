@@ -3,15 +3,17 @@
 using System;
 using System.Collections.Generic;
 
-namespace DataAccessLayer.Models
-{
-    public partial class SpotifyArtistAlbum
-    {
-        public int Id { get; set; }
-        public string ArtistId { get; set; }
-        public string AlbumId { get; set; }
+namespace DataAccessLayer.Models;
 
-        public virtual SpotifyAlbum Album { get; set; }
-        public virtual SpotifyArtist Artist { get; set; }
-    }
+public partial class SpotifyArtistAlbum
+{
+    public int Id { get; set; }
+
+    public string ArtistId { get; set; }
+
+    public string AlbumId { get; set; }
+
+    public virtual SpotifyAlbum Album { get; set; }
+
+    public virtual SpotifyArtist Artist { get; set; }
 }

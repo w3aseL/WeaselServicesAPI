@@ -3,19 +3,25 @@
 using System;
 using System.Collections.Generic;
 
-namespace DataAccessLayer.Models
-{
-    public partial class Position
-    {
-        public Guid Id { get; set; }
-        public string JobTitle { get; set; }
-        public string CompanyName { get; set; }
-        public string CompanyUrl { get; set; }
-        public string Description { get; set; }
-        public DateTime StartDate { get; set; }
-        public DateTime EndDate { get; set; }
-        public Guid? ImageId { get; set; }
+namespace DataAccessLayer.Models;
 
-        public virtual Image Image { get; set; }
-    }
+public partial class Position
+{
+    public Guid Id { get; set; }
+
+    public string JobTitle { get; set; }
+
+    public string CompanyName { get; set; }
+
+    public string CompanyUrl { get; set; }
+
+    public string Description { get; set; }
+
+    public DateTime StartDate { get; set; }
+
+    public DateTime EndDate { get; set; }
+
+    public Guid? ImageId { get; set; }
+
+    public virtual Image Image { get; set; }
 }

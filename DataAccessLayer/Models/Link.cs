@@ -5,11 +5,15 @@ using System.Collections.Generic;
 
 namespace DataAccessLayer.Models;
 
-public partial class Category
+public partial class Link
 {
     public int Id { get; set; }
 
-    public string Name { get; set; }
+    public string LinkName { get; set; }
 
-    public virtual ICollection<Tool> Tools { get; set; } = new List<Tool>();
+    public string LinkUrl { get; set; }
+
+    public string LogoUrl { get; set; }
+
+    public string LogoAlt { get; set; }
 }

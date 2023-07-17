@@ -3,20 +3,27 @@
 using System;
 using System.Collections.Generic;
 
-namespace DataAccessLayer.Models
-{
-    public partial class Education
-    {
-        public Guid Id { get; set; }
-        public string SchoolName { get; set; }
-        public string SchoolType { get; set; }
-        public string SchoolUrl { get; set; }
-        public string RewardType { get; set; }
-        public string Major { get; set; }
-        public DateTime GraduationDate { get; set; }
-        public decimal Gpa { get; set; }
-        public Guid? ImageId { get; set; }
+namespace DataAccessLayer.Models;
 
-        public virtual Image Image { get; set; }
-    }
+public partial class Education
+{
+    public Guid Id { get; set; }
+
+    public string SchoolName { get; set; }
+
+    public string SchoolType { get; set; }
+
+    public string SchoolUrl { get; set; }
+
+    public string RewardType { get; set; }
+
+    public string Major { get; set; }
+
+    public DateTime GraduationDate { get; set; }
+
+    public decimal Gpa { get; set; }
+
+    public Guid? ImageId { get; set; }
+
+    public virtual Image Image { get; set; }
 }

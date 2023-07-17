@@ -3,23 +3,21 @@
 using System;
 using System.Collections.Generic;
 
-namespace DataAccessLayer.Models
+namespace DataAccessLayer.Models;
+
+public partial class Project
 {
-    public partial class Project
-    {
-        public Project()
-        {
-            ProjectImages = new HashSet<ProjectImage>();
-            ProjectTools = new HashSet<ProjectTool>();
-        }
+    public Guid Id { get; set; }
 
-        public Guid Id { get; set; }
-        public string Name { get; set; }
-        public string Description { get; set; }
-        public string Url { get; set; }
-        public string RepoUrl { get; set; }
+    public string Name { get; set; }
 
-        public virtual ICollection<ProjectImage> ProjectImages { get; set; }
-        public virtual ICollection<ProjectTool> ProjectTools { get; set; }
-    }
+    public string Description { get; set; }
+
+    public string Url { get; set; }
+
+    public string RepoUrl { get; set; }
+
+    public virtual ICollection<ProjectImage> ProjectImages { get; set; } = new List<ProjectImage>();
+
+    public virtual ICollection<ProjectTool> ProjectTools { get; set; } = new List<ProjectTool>();
 }

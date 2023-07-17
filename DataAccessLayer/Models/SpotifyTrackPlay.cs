@@ -3,16 +3,19 @@
 using System;
 using System.Collections.Generic;
 
-namespace DataAccessLayer.Models
-{
-    public partial class SpotifyTrackPlay
-    {
-        public int Id { get; set; }
-        public string SongId { get; set; }
-        public int SessionId { get; set; }
-        public int TimePlayed { get; set; }
+namespace DataAccessLayer.Models;
 
-        public virtual SpotifySession Session { get; set; }
-        public virtual SpotifySong Song { get; set; }
-    }
+public partial class SpotifyTrackPlay
+{
+    public int Id { get; set; }
+
+    public string SongId { get; set; }
+
+    public int SessionId { get; set; }
+
+    public int TimePlayed { get; set; }
+
+    public virtual SpotifySession Session { get; set; }
+
+    public virtual SpotifySong Song { get; set; }
 }

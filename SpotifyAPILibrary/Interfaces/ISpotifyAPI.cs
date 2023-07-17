@@ -11,6 +11,7 @@ namespace SpotifyAPILibrary
         public SpotifySongModel GetCurrentlyListenedToSong(int userId);
         public SpotifyPlayerStateModel GetPlayerStatus(int userId);
         public (int, List<SessionModel>) GetAllSpotifySessions(int userId, int offset=0, int? limit=null);
+        public List<SessionModel> GetRecentSessions(int userId);
         public SessionModel GetSpotifySession(int userId, int sessionId);
         public (int, List<SpotifySongModel>) GetAllSongs(int offset = 0, int? limit = null);
         public SpotifySongModel GetSong(string songId);

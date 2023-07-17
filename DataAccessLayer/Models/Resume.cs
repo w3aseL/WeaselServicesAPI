@@ -3,14 +3,17 @@
 using System;
 using System.Collections.Generic;
 
-namespace DataAccessLayer.Models
+namespace DataAccessLayer.Models;
+
+public partial class Resume
 {
-    public partial class Resume
-    {
-        public Guid Id { get; set; }
-        public string FileName { get; set; }
-        public string Url { get; set; }
-        public string Key { get; set; }
-        public DateTime CreationDate { get; set; }
-    }
+    public Guid Id { get; set; }
+
+    public string FileName { get; set; }
+
+    public string Url { get; set; }
+
+    public string Key { get; set; }
+
+    public DateTime CreationDate { get; set; }
 }

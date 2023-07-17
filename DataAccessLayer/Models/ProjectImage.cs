@@ -3,16 +3,19 @@
 using System;
 using System.Collections.Generic;
 
-namespace DataAccessLayer.Models
-{
-    public partial class ProjectImage
-    {
-        public int Id { get; set; }
-        public Guid ProjectId { get; set; }
-        public Guid ImageId { get; set; }
-        public bool IsLogo { get; set; }
+namespace DataAccessLayer.Models;
 
-        public virtual Image Image { get; set; }
-        public virtual Project Project { get; set; }
-    }
+public partial class ProjectImage
+{
+    public int Id { get; set; }
+
+    public Guid ProjectId { get; set; }
+
+    public Guid ImageId { get; set; }
+
+    public bool IsLogo { get; set; }
+
+    public virtual Image Image { get; set; }
+
+    public virtual Project Project { get; set; }
 }

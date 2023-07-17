@@ -1,5 +1,5 @@
 ﻿{
-   "CodeGenerationMode": 2,
+   "CodeGenerationMode": 3,
    "ContextClassName": "ServicesAPIContext",
    "ContextNamespace": null,
    "DefaultDacpacSchema": null,
@@ -28,6 +28,10 @@
       },
       {
          "Name": "[dbo].[Image]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[dbo].[Link]",
          "ObjectType": 0
       },
       {

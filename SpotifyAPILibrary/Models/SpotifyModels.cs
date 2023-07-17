@@ -118,8 +118,8 @@ namespace SpotifyAPILibrary.Models
         public SessionModel(SpotifySession s)
         {
             SessionId = s.Id;
-            StartTime = s.StartTime;
-            EndTime = s.EndTime;
+            StartTime = s.StartTime.ToCentralTime();
+            EndTime = s.EndTime.ToCentralTime();
             SongCount = s.SongCount;
             TimeListening = s.TimeListening;
         }
@@ -156,6 +156,16 @@ namespace SpotifyAPILibrary.Models
                 return "https://spotify.com/";
 
             return $"https://open.spotify.com/{uriSplit[1]}/{uriSplit[2]}";
+        }
+    }
+
+    public static class DateTimeExtensions
+    {
+        public static DateTime ToCentralTime(this DateTime time)
+        {
+            TimeZoneInfo cstZone = TimeZoneInfo.FindSystemTimeZoneById("Central Standard Time");
+
+            return TimeZoneInfo.ConvertTimeFromUtc(time, cstZone);
         }
     }
 }

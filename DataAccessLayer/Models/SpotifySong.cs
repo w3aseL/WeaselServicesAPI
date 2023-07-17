@@ -3,24 +3,21 @@
 using System;
 using System.Collections.Generic;
 
-namespace DataAccessLayer.Models
+namespace DataAccessLayer.Models;
+
+public partial class SpotifySong
 {
-    public partial class SpotifySong
-    {
-        public SpotifySong()
-        {
-            SpotifySongAlbums = new HashSet<SpotifySongAlbum>();
-            SpotifySongArtists = new HashSet<SpotifySongArtist>();
-            SpotifyTrackPlays = new HashSet<SpotifyTrackPlay>();
-        }
+    public string Id { get; set; }
 
-        public string Id { get; set; }
-        public string Title { get; set; }
-        public int Duration { get; set; }
-        public string Url { get; set; }
+    public string Title { get; set; }
 
-        public virtual ICollection<SpotifySongAlbum> SpotifySongAlbums { get; set; }
-        public virtual ICollection<SpotifySongArtist> SpotifySongArtists { get; set; }
-        public virtual ICollection<SpotifyTrackPlay> SpotifyTrackPlays { get; set; }
-    }
+    public int Duration { get; set; }
+
+    public string Url { get; set; }
+
+    public virtual ICollection<SpotifySongAlbum> SpotifySongAlbums { get; set; } = new List<SpotifySongAlbum>();
+
+    public virtual ICollection<SpotifySongArtist> SpotifySongArtists { get; set; } = new List<SpotifySongArtist>();
+
+    public virtual ICollection<SpotifyTrackPlay> SpotifyTrackPlays { get; set; } = new List<SpotifyTrackPlay>();
 }

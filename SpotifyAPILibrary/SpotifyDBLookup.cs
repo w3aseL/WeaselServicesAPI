@@ -148,6 +148,19 @@ namespace SpotifyAPILibrary
                 .FirstOrDefault();
         }
 
+        public List<SpotifySession> GetRecentSpotifySessions(int userId, int count=3)
+        {
+            var account = GetAccountByUserId(userId);
+
+            if (account is null)
+                throw new SpotifyAccountNotFoundException("Could not find Spotify account linked to that user!");
+
+            return _ctx.SpotifySessions.Where(s => s.AccountId == account.SpotifyAuthId)
+                .OrderByDescending(s => s.Id)
+                .Take(count)
+                .ToList();
+        }
+
         public (int, List<SpotifySong>) GetAllSpotifySongs(int offset=0, int? limit=null)
         {
             var count = _ctx.SpotifySongs.Count();

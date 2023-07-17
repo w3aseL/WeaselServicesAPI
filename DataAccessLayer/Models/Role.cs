@@ -3,21 +3,15 @@
 using System;
 using System.Collections.Generic;
 
-namespace DataAccessLayer.Models
+namespace DataAccessLayer.Models;
+
+public partial class Role
 {
-    public partial class Role
-    {
-        public Role()
-        {
-            Users = new HashSet<User>();
-            Permissions = new HashSet<Permission>();
-        }
+    public int RoleId { get; set; }
 
-        public int RoleId { get; set; }
-        public string RoleName { get; set; }
+    public string RoleName { get; set; }
 
-        public virtual ICollection<User> Users { get; set; }
+    public virtual ICollection<User> Users { get; set; } = new List<User>();
 
-        public virtual ICollection<Permission> Permissions { get; set; }
-    }
+    public virtual ICollection<Permission> Permissions { get; set; } = new List<Permission>();
 }
