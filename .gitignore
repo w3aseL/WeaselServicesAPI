@@ -366,3 +366,5 @@ FodyWeavers.xsd
 /WeaselServicesAPI/appsettings.Development.json
 /WeaselServicesAPI/appsettings.Release.json
 /WeaselServicesAPI/appsettings.Debug.json
+/Database/dbo/Security/CMKBlogKey.sql
+/Database/dbo/Security/CMK-Service-API.sql
