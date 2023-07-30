@@ -21,6 +21,7 @@ namespace SpotifyAPILibrary
 
         public bool IsPlaying { get; set; }
         public bool IsSessionActive { get; set; }
+        public int SkipCount { get; set; }
         public DateTime SessionStartTime { get; set; }
         public DateTime SessionEndTime { get; set; }
         private Stopwatch InactivityStopwatch { get; set; }
@@ -42,9 +43,10 @@ namespace SpotifyAPILibrary
             SongStopwatch = new Stopwatch();
             InactivityStopwatch = new Stopwatch();
             _queue = queue;
+            SkipCount = 0;
         }
 
-        private void CheckIfSongIsToBeAdded()
+        private bool CheckIfSongIsToBeAdded()
         {
             if (SongStopwatch.ElapsedMilliseconds > (CurrentSong.DurationMs / 2))
             {
@@ -53,7 +55,11 @@ namespace SpotifyAPILibrary
                     Song = CurrentSong,
                     TimePlayed = (int) SongStopwatch.ElapsedMilliseconds / 1000
                 });
+
+                return true;
             }
+
+            return false;
         }
 
         public (bool, string) UpdateActiveState(CurrentlyPlayingContext ctx)
@@ -108,11 +114,12 @@ namespace SpotifyAPILibrary
                     SessionEndTime = DateTime.Now;
 
                     _queue.Queue.Enqueue(new SpotifySessionJob("AddSession",
-                        new SpotifyPlayerSessionModel(SpotifyAccountId, SessionStartTime, SessionEndTime, SessionStopwatch.ElapsedMilliseconds / 1000, SongList)));
+                        new SpotifyPlayerSessionModel(SpotifyAccountId, SessionStartTime, SessionEndTime, SessionStopwatch.ElapsedMilliseconds / 1000, SongList, SkipCount)));
 
                     // reset session
                     IsSessionActive = false;
                     SongList = new List<SpotifySessionSongRecord>();
+                    SkipCount = 0;
 
                     stateChanged = true;
                     stateChangeMessage = $"Spotify session for user {SpotifyAccountId} has ended! Session lasted {SessionStopwatch.Elapsed.TotalSeconds} seconds.";
@@ -134,12 +141,13 @@ namespace SpotifyAPILibrary
                 if (CurrentSong is null || CurrentSong.Id != song.Id)
                 {
                     var prevSong = PreviousSong;
+                    var addedSong = false;
 
                     if (CurrentSong is not null && CurrentSong.Id != song.Id)
                     {
                         prevSong = CurrentSong;
 
-                        CheckIfSongIsToBeAdded();
+                        addedSong = CheckIfSongIsToBeAdded();
                         SongStopwatch.Restart();
 
                         stateChanged = true;
@@ -148,10 +156,14 @@ namespace SpotifyAPILibrary
                     if (CurrentSong is null && song is not null)
                         SongStopwatch.Start();
 
-                    PreviousSong = prevSong;
+                    if (addedSong)
+                        PreviousSong = prevSong;
+                    else if (!addedSong && CurrentSong != null)
+                        SkipCount++;
+
                     CurrentSong = new SpotifySongModel(song);
 
-                    stateChangeMessage = $"Spotify session for user {SpotifyAccountId} has changed songs! {(PreviousSong != null ? $"Previous song: \"{PreviousSong.Name}\", " : "")}Current Song: \"{CurrentSong.Name}\".";
+                    stateChangeMessage = $"Spotify session for user {SpotifyAccountId} has changed songs! {(prevSong != null ? $"Previous song: \"{prevSong.Name}\", " : "")}Current Song: \"{CurrentSong.Name}\".";
                 }
             }
 
@@ -210,6 +222,7 @@ namespace SpotifyAPILibrary
         public double TimeInactive { get; set; }
         public double SessionLength { get; set; }
         public long SongPositionMs { get; set; }
+        public int SkipCount { get; set; }
 
         public SpotifyPlayerStateModel(SpotifyPlayerActiveState state)
         {
@@ -222,6 +235,7 @@ namespace SpotifyAPILibrary
             TimeInactive = state.GetTimeInactive();
             SessionLength = state.GetSessionTime();
             SongPositionMs = state.GetActiveSongTime();
+            SkipCount = state.SkipCount;
         }
     }
 
@@ -232,14 +246,16 @@ namespace SpotifyAPILibrary
         public List<SpotifySessionSongRecord> SongList { get; set; }
         public DateTime StartTime { get; set; }
         public DateTime EndTime { get; set; }
+        public int SkipCount { get; set; }
 
-        public SpotifyPlayerSessionModel(int accountId, DateTime startTime, DateTime endTime, long sessionLength, List<SpotifySessionSongRecord> list)
+        public SpotifyPlayerSessionModel(int accountId, DateTime startTime, DateTime endTime, long sessionLength, List<SpotifySessionSongRecord> list, int skipCount=0)
         {
             SpotifyAccountId = accountId;
             StartTime = startTime;
             EndTime = endTime;
             SessionLength = sessionLength;
             SongList = list;
+            SkipCount = skipCount;
         }
     }
 }

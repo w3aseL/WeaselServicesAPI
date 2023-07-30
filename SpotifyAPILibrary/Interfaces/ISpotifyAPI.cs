@@ -20,7 +20,6 @@ namespace SpotifyAPILibrary
         public (int, List<SpotifySongStatisticModel>) GetSongStatistics(DateTime? startDate, DateTime? endDate, int offset = 0, int? limit = null);
         public (int, List<SpotifyArtistStatisticModel>) GetArtistStatistics(DateTime? startDate, DateTime? endDate, int offset = 0, int? limit = null);
         public (int, List<SpotifyAlbumStatisticModel>) GetAlbumStatistics(DateTime? startDate, DateTime? endDate, int offset = 0, int? limit = null);
-
-
+        public Task<SpotifyPlaylistModel> CreateTestPlaylist(int userId, string title, string description, DateTime? startDate, int songCount = 25);
     }
 }

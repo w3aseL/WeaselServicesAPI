@@ -10,3 +10,7 @@
 
 	CONSTRAINT SpotifyAccount_FK_User FOREIGN KEY ([UserId]) REFERENCES [User]([UserId])
 )
+GO
+
+CREATE INDEX [IDX_SpotifyAccount_User] ON [SpotifyAccount] ([UserId])
+GO

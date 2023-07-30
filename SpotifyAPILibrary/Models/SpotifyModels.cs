@@ -112,6 +112,7 @@ namespace SpotifyAPILibrary.Models
         public DateTime EndTime { get; set; }
         public int SongCount { get; set; }
         public int TimeListening { get; set; }
+        public int? SkipCount { get; set; }
 
         public List<TrackPlayModel> TrackPlays { get; set; }
 
@@ -122,6 +123,7 @@ namespace SpotifyAPILibrary.Models
             EndTime = s.EndTime.ToCentralTime();
             SongCount = s.SongCount;
             TimeListening = s.TimeListening;
+            SkipCount = s.SkipCount;
         }
     }
 
@@ -144,6 +146,20 @@ namespace SpotifyAPILibrary.Models
     public class SpotifyAlbumStatisticModel : SpotifyStatisticModel
     {
         public SpotifyAlbumModel Album { get; set; }
+    }
+
+    public class SpotifyPlaylistModel
+    {
+        public string Uri { get; set; }
+        public string Title { get; set; }
+        public string Description { get; set; }
+
+        public SpotifyPlaylistModel(FullPlaylist pl)
+        {
+            Uri = pl.Uri;
+            Title = pl.Name;
+            Description = pl.Description;
+        }
     }
 
     public static class SpotifyUriTranslator

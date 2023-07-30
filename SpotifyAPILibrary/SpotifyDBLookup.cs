@@ -14,7 +14,7 @@ namespace SpotifyAPILibrary
     public class SpotifyDBLookup
     {
         private const int CODE_EXPIRATION_TIME_MIN = 30;
-        private static string[] SPOTIFY_SCOPES = new []{ Scopes.UserReadEmail, Scopes.UserReadPlaybackState, Scopes.UserReadPlaybackPosition, Scopes.UserReadCurrentlyPlaying, Scopes.UserReadRecentlyPlayed, Scopes.UserTopRead };
+        private static string[] SPOTIFY_SCOPES = new []{ Scopes.UserReadEmail, Scopes.UserReadPrivate, Scopes.UserReadPlaybackState, Scopes.UserReadPlaybackPosition, Scopes.UserReadCurrentlyPlaying, Scopes.UserReadRecentlyPlayed, Scopes.UserTopRead, Scopes.PlaylistModifyPublic, Scopes.PlaylistModifyPrivate, Scopes.PlaylistReadCollaborative, Scopes.PlaylistReadPrivate };
 
         private readonly ServicesAPIContext _ctx;
 
@@ -65,7 +65,11 @@ namespace SpotifyAPILibrary
 
         public async Task SetupAccountWithCode(string authCode, string authState, string clientId, string clientSecret, string redirectUrl)
         {
-            var accountReq = _ctx.SpotifyAccountRequests.FirstOrDefault(sar => sar.AuthorizationCode.ToString() == authState);
+            Guid? state = null;
+
+            if (Guid.TryParse(authState, out Guid guid)) state = guid;
+
+            var accountReq = _ctx.SpotifyAccountRequests.FirstOrDefault(sar => sar.AuthorizationCode == state);
             var userId = accountReq.UserId;
 
             var newRes = await new OAuthClient().RequestToken(new AuthorizationCodeTokenRequest(clientId, clientSecret, authCode, new Uri(redirectUrl)));
@@ -209,8 +213,9 @@ namespace SpotifyAPILibrary
 
         public IQueryable<SpotifyTrackPlay> GetTrackPlaysInRange(DateTime? startDate, DateTime? endDate)
         {
-            return _ctx.SpotifyTrackPlays.Where(tp => tp.Session.StartTime >= startDate || tp.Session.StartTime <= endDate
-                || tp.Session.StartTime <= endDate || tp.Session.EndTime <= endDate)
+            return _ctx.SpotifyTrackPlays
+                    .Where(tp => (tp.Session.StartTime >= startDate && tp.Session.StartTime <= endDate)
+                  || (tp.Session.EndTime >= startDate && tp.Session.EndTime <= endDate))
                     .Include(tp => tp.Song)
                     .Include(tp => tp.Song.SpotifySongArtists)
                     .ThenInclude(sa => sa.Artist)

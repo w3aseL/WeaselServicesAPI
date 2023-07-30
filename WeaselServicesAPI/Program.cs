@@ -12,6 +12,8 @@ using WeaselServicesAPI.Helpers.Interfaces;
 using WeaselServicesAPI.Helpers.JWT;
 using PortfolioLibrary.Services;
 using EmailService;
+using DataAccessLayer.Configuration;
+using SpotifyAPILibrary.Services;
 
 const string CORS_POLICY_NAME = "DashboardPolicy";
 
@@ -27,8 +29,10 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
 // dbcontext
+var azureSettings = builder.Configuration.GetSection("AzureIdentity").Get<AzureIdentity>();
+builder.Services.AddSingleton<AzureIdentity>(azureSettings);
 builder.Services.AddDbContext<ServicesAPIContext>(
-    options => options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
+    options => options.EnableDetailedErrors(true).UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
 // email system
 var emailConfig = builder.Configuration.GetSection("EmailSettings").Get<EmailSettings>();
@@ -93,6 +97,10 @@ builder.Services.AddHostedService(provider => provider.GetRequiredService<Spotif
 // session saving queue task
 builder.Services.AddSingleton<SpotifySessionWriterTaskService>();
 builder.Services.AddHostedService(provider => provider.GetRequiredService<SpotifySessionWriterTaskService>());
+
+// playlist writing task
+builder.Services.AddSingleton<SpotifyPlaylistBackgroundService>();
+builder.Services.AddHostedService(provider => provider.GetRequiredService<SpotifyPlaylistBackgroundService>());
 
 var app = builder.Build();
 

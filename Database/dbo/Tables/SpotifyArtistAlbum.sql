@@ -7,3 +7,10 @@
 	CONSTRAINT FK_ArtistAlbum_Artist FOREIGN KEY (ArtistId) REFERENCES [SpotifyArtist]([Id]),
 	CONSTRAINT FK_ArtistAlbum_Album FOREIGN KEY (AlbumId) REFERENCES [SpotifyAlbum]([Id])
 )
+GO
+
+CREATE INDEX [IDX_ArtistAlbum_Artist] ON [SpotifyArtistAlbum] ([ArtistId])
+GO
+
+CREATE INDEX [IDX_ArtistAlbum_Album] ON [SpotifyArtistAlbum] ([AlbumId])
+GO

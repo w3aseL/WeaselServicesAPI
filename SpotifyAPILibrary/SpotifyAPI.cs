@@ -3,6 +3,7 @@ using DataAccessLayer.Models;
 using SpotifyAPI.Web;
 using SpotifyAPI.Web.Http;
 using SpotifyAPILibrary.Models;
+using SpotifyAPILibrary.Services;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -17,6 +18,7 @@ namespace SpotifyAPILibrary
         private SpotifyClientFactory _clientFactory;
         private SpotifyDBLookup _lookup;
         private SpotifyStateManager _stateManager;
+        private SpotifyPlaylistService _playlistService;
 
         public SpotifyAPI(SpotifySettings settings, ServicesAPIContext ctx, SpotifyClientFactory clientFactory, SpotifyStateManager stateManager)
         {
@@ -24,6 +26,7 @@ namespace SpotifyAPILibrary
             _clientFactory = clientFactory;
             _lookup = new SpotifyDBLookup(ctx);
             _stateManager = stateManager;
+            _playlistService = new SpotifyPlaylistService(ctx);
         }
 
         public async Task<SpotifySongModel> GetTrack()
@@ -144,7 +147,7 @@ namespace SpotifyAPILibrary
         {
             var trackPlays = _lookup.GetTrackPlaysInRange(startDate, endDate);
 
-            var tpQueryable = trackPlays.GroupBy(tp => tp.Song.Title)
+            var tpQueryable = trackPlays.GroupBy(tp => new { tp.Song.Title, tp.Song.SpotifySongArtists.First().Artist.Name })
                 .Select(g => new SpotifySongStatisticModel
                 {
                     TimesPlayed = g.Count(),
@@ -168,7 +171,7 @@ namespace SpotifyAPILibrary
         {
             var trackPlays = _lookup.GetTrackPlaysInRange(startDate, endDate).ToList();
 
-            var tpQueryable = trackPlays.GroupBy(tp => tp.Song.SpotifySongArtists.First().Artist)
+            var tpQueryable = trackPlays.GroupBy(tp => tp.Song.SpotifySongArtists.First().Artist.Name)
                 .Select(g => new SpotifyArtistStatisticModel
                 {
                     TimesPlayed = g.Count(),
@@ -210,6 +213,21 @@ namespace SpotifyAPILibrary
             if (limit.HasValue) queryable = queryable.Take(limit.Value);
 
             return (count, queryable.ToList());
+        }
+
+        #endregion
+
+        #region Playlist Testing
+
+        public async Task<SpotifyPlaylistModel> CreateTestPlaylist(int userId, string title, string description, DateTime? startDate, int songCount=25)
+        {
+            var accessToken = await _lookup.GetAccountAccessToken(userId, _settings.ClientId, _settings.ClientSecret);
+
+            var client = _clientFactory.CreateUserClient(accessToken);
+
+            var playlist = await _playlistService.CreatePlaylistByTimespan(client, songCount, title, description, startDate.HasValue ? startDate.Value : System.Data.SqlTypes.SqlDateTime.MinValue.Value);
+
+            return playlist != null ? new SpotifyPlaylistModel(playlist) : null;
         }
 
         #endregion

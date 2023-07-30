@@ -7,4 +7,11 @@
 
 	CONSTRAINT FK_TrackPlay_Song FOREIGN KEY (SongId) REFERENCES [SpotifySong]([Id]),
 	CONSTRAINT FK_TrackPlay_Session FOREIGN KEY (SessionId) REFERENCES [SpotifySession]([Id])
-) 
+)
+GO
+
+CREATE INDEX [IDX_TrackPlay_Song] ON [SpotifyTrackPlay] ([SongId])
+GO
+
+CREATE INDEX [IDX_TrackPlay_Session] ON [SpotifyTrackPlay] ([SessionId])
+GO

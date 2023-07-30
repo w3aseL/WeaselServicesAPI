@@ -77,7 +77,8 @@ namespace SpotifyAPILibrary
                                 StartTime = currentState.StartTime,
                                 EndTime = currentState.EndTime,
                                 SongCount = currentState.SongList.Count,
-                                TimeListening = (int) currentState.SessionLength
+                                TimeListening = (int) currentState.SessionLength,
+                                SkipCount = currentState.SkipCount
                             };
                             ctx.SpotifySessions.Add(session);
                             ctx.SaveChanges();

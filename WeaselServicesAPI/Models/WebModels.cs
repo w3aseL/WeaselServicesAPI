@@ -5,4 +5,10 @@
         public int Offset { get; set; } = 0;
         public int? Limit { get; set; }
     }
+
+    public class DatePagingParams : PagingParams
+    {
+        public DateTime? StartDate { get; set; }
+        public DateTime? EndDate { get; set; }
+    }
 }

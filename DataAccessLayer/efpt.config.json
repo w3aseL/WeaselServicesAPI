@@ -11,11 +11,23 @@
    "PreserveCasingWithRegex": true,
    "ProjectRootNamespace": "DataAccessLayer",
    "Schemas": null,
-   "SelectedHandlebarsLanguage": 0,
+   "SelectedHandlebarsLanguage": 2,
    "SelectedToBeGenerated": 0,
    "Tables": [
       {
          "Name": "[dbo].[BlacklistedToken]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[dbo].[BlogAuthor]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[dbo].[BlogCategory]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[dbo].[BlogPost]",
          "ObjectType": 0
       },
       {
@@ -134,8 +146,8 @@
    "UseNoDefaultConstructor": false,
    "UseNoObjectFilter": false,
    "UseNodaTime": false,
-   "UseNullableReferences": false,
+   "UseNullableReferences": true,
    "UseSchemaFolders": false,
    "UseSpatial": false,
-   "UseT4": false
+   "UseT4": true
 }

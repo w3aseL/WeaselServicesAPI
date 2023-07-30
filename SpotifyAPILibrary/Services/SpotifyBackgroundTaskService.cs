@@ -44,26 +44,32 @@ namespace SpotifyAPILibrary
             {
                 foreach (var account in accounts)
                 {
-                    // refresh token if applicable
-                    if (account.AccessGeneratedDate.AddSeconds(account.ExpiresIn) < DateTime.UtcNow)
+                    try
                     {
-                        var newResponse = await new OAuthClient().RequestToken(new AuthorizationCodeRefreshRequest(_settings.ClientId, _settings.ClientSecret, account.RefreshToken));
+                        // refresh token if applicable
+                        if (account.AccessGeneratedDate.AddSeconds(account.ExpiresIn) < DateTime.UtcNow)
+                        {
+                            var newResponse = await new OAuthClient().RequestToken(new AuthorizationCodeRefreshRequest(_settings.ClientId, _settings.ClientSecret, account.RefreshToken));
 
-                        account.AccessToken = newResponse.AccessToken;
-                        account.AccessGeneratedDate = newResponse.CreatedAt;
-                        account.ExpiresIn = newResponse.ExpiresIn;
-                        await ctx.SaveChangesAsync();
+                            account.AccessToken = newResponse.AccessToken;
+                            account.AccessGeneratedDate = newResponse.CreatedAt;
+                            account.ExpiresIn = newResponse.ExpiresIn;
+                            await ctx.SaveChangesAsync();
+                        }
+
+                        // get client
+                        var client = _clientFactory.CreateUserClient(account.AccessToken);
+
+                        // testing
+                        var currentlyPlaying = await client.Player.GetCurrentPlayback();
+                        var (stateUpdates, stateUpdateMessage) = _manager.UpdateActiveState(account.SpotifyAuthId, currentlyPlaying);
+
+                        if (stateUpdates)
+                            _logger.LogInformation(stateUpdateMessage, DateTime.Now);
+                    } catch(Exception ex)
+                    {
+                        _logger.LogError(ex.Message);
                     }
-
-                    // get client
-                    var client = _clientFactory.CreateUserClient(account.AccessToken);
-
-                    // testing
-                    var currentlyPlaying = await client.Player.GetCurrentPlayback();
-                    var (stateUpdates, stateUpdateMessage) = _manager.UpdateActiveState(account.SpotifyAuthId, currentlyPlaying);
-
-                    if (stateUpdates)
-                        _logger.LogInformation(stateUpdateMessage, DateTime.Now);
                 }
             }
         }
