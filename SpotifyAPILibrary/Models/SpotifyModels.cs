@@ -162,6 +162,15 @@ namespace SpotifyAPILibrary.Models
         }
     }
 
+    public sealed class SpotifySummaryModel
+    {
+        public int TimeListening { get; set; }
+        public int SkipCount { get; set; }
+        public int SongsPlayed { get; set; }
+        public int UniqueSongs { get; set; }
+        public int SessionCount { get; set; }
+    }
+
     public static class SpotifyUriTranslator
     {
         public static string ConvertUriToHref(string uri)

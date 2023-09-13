@@ -224,5 +224,14 @@ namespace SpotifyAPILibrary
                     .ThenInclude(a => a.SpotifyArtistAlbums)
                     .ThenInclude(aa => aa.Artist);
         }
+
+        public List<SpotifySession> GetSessionsInRange(DateTime? startDate, DateTime? endDate)
+        {
+            return _ctx.SpotifySessions
+                .Where(s => (s.StartTime >= startDate && s.StartTime <= endDate)
+                  || (s.EndTime >= startDate && s.EndTime <= endDate))
+                .Include(s => s.SpotifyTrackPlays)
+                .ToList();
+        }
     }
 }

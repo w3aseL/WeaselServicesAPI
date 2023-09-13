@@ -63,7 +63,7 @@ namespace WeaselServicesAPI.Controllers
             {
                 _service.DeleteLink(linkId);
 
-                return ResponseHelper.GenerateResponse(new {}, (int)HttpStatusCode.NoContent);
+                return ResponseHelper.GenerateResponse(new {}, (int)HttpStatusCode.OK);
             }
             catch (Exception e)
             {

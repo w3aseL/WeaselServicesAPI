@@ -359,6 +359,22 @@ namespace WeaselServicesAPI.Controllers
             }
         }
 
+        [HttpGet, Route("stats/summary"), Authorize]
+        public JsonResult GetRangeStatistics([FromQuery] DatePagingParams paging)
+        {
+            try
+            {
+                return ResponseHelper.GenerateResponse(_spotify.GetTimespanSummary(
+                    paging.StartDate.HasValue ? paging.StartDate.Value : SqlDateTime.MinValue.Value,
+                    paging.EndDate.HasValue ? paging.EndDate.Value.AddDays(1).AddSeconds(-1) : DateTime.Now
+                ), (int)HttpStatusCode.OK);
+            }
+            catch (Exception e)
+            {
+                return ResponseHelper.GenerateResponse(new { Message = e.Message }, (int)HttpStatusCode.InternalServerError);
+            }
+        }
+
         /*
         [HttpGet, Route("playlist-test"), Authorize]
         public async Task<JsonResult> TestPlaylistCreation()

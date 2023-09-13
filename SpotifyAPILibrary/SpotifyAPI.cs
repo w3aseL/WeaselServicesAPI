@@ -215,6 +215,21 @@ namespace SpotifyAPILibrary
             return (count, queryable.ToList());
         }
 
+        public SpotifySummaryModel GetTimespanSummary(DateTime startDate, DateTime? endDate)
+        {
+            var sessions = _lookup.GetSessionsInRange(startDate, endDate);
+
+            return new SpotifySummaryModel
+            {
+                SessionCount = sessions.Count,
+                TimeListening = sessions.Sum(s => s.TimeListening),
+                SkipCount = sessions.Sum(s => s.SkipCount) ?? 0,
+                SongsPlayed = sessions.Sum(s => s.SpotifyTrackPlays.Count),
+                UniqueSongs = sessions.SelectMany(s => s.SpotifyTrackPlays)
+                    .GroupBy(tp => tp.SongId).Select(g => g.First()).Count()
+            };
+        }
+
         #endregion
 
         #region Playlist Testing
