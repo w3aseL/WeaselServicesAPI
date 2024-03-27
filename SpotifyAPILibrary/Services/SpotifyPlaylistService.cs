@@ -71,6 +71,7 @@ namespace SpotifyAPILibrary.Services
         private List<string> GetTopTracks(DateTime startInterval, DateTime endInterval, int songCount)
         {
             return _dbLookup.GetTrackPlaysInRange(startInterval, endInterval)
+                .Where(tp => tp.Song.Url != "local")
                 .GroupBy(tp => new { tp.Song.Title, tp.Song.SpotifySongArtists.First().Artist.Name })
                 .Select(g => new SpotifySongStatisticModel
                 {

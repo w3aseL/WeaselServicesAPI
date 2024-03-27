@@ -1,5 +1,8 @@
-﻿using Amazon.S3;
+﻿using Amazon;
+using Amazon.Runtime;
+using Amazon.S3;
 using Amazon.S3.Model;
+using Azure;
 using Microsoft.AspNetCore.Http;
 
 namespace PortfolioLibrary
@@ -15,26 +18,27 @@ namespace PortfolioLibrary
 
         public async Task UploadFile(string folder, IFormFile file)
         {
-            using var client = new AmazonS3Client(_settings.AccessKey, _settings.SecretKey);
+            using var client = new AmazonS3Client(GetCredentials(), RegionEndpoint.USEast2);
 
-            var objReq = new PutObjectRequest()
-            {
-                BucketName = _settings.Bucket,
-                FilePath = $"{ folder }/{ file.FileName }",
-                InputStream = file.OpenReadStream()
-            };
+            var stream = new MemoryStream();
+            file.CopyTo(stream);
+            stream.Position = 0;
 
-            await client.PutObjectAsync(objReq);
+            PutObjectRequest request = new PutObjectRequest();
+            request.InputStream = stream;
+            request.BucketName = _settings.Bucket;
+            request.Key = $"{GetTestModeKey()}{folder}/{file.FileName}";
+            await client.PutObjectAsync(request);
         }
 
         public async Task DeleteFile(string fileKey)
         {
-            using var client = new AmazonS3Client(_settings.AccessKey, _settings.SecretKey);
+            using var client = new AmazonS3Client(GetCredentials(), RegionEndpoint.USEast2);
 
             var objReq = new DeleteObjectRequest()
             {
                 BucketName = _settings.Bucket,
-                Key = fileKey
+                Key = $"{GetTestModeKey()}{fileKey}"
             };
 
             await client.DeleteObjectAsync(objReq);
@@ -44,5 +48,12 @@ namespace PortfolioLibrary
         {
             return $"https://{ _settings.Bucket }/";
         }
+
+        private string GetTestModeKey()
+        {
+            return $"{(_settings.TestMode ? "test-wsl-srv/" : "")}";
+        }
+
+        private AWSCredentials GetCredentials() => new BasicAWSCredentials(_settings.AccessKey, _settings.SecretKey);
     }
 }

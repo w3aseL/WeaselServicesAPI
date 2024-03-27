@@ -7,13 +7,23 @@ namespace EmailService
     public class EmailSender : IEmailSender
     {
         private readonly EmailSettings _emailConfig;
-        public EmailSender(EmailSettings emailConfig)
+        private readonly IEmailRenderer _renderer;
+
+        public EmailSender(EmailSettings emailConfig, IEmailRenderer renderer)
         {
             _emailConfig = emailConfig;
+            _renderer = renderer;
         }
+
         public void SendEmail(Message message)
         {
             var emailMessage = CreateEmailMessage(message);
+            Send(emailMessage);
+        }
+
+        public async Task SendEmailWithModel<T>(ModeledMessage<T> message)
+        {
+            var emailMessage = await CreateEmailMessage(message);
             Send(emailMessage);
         }
 
@@ -24,6 +34,17 @@ namespace EmailService
             emailMessage.To.AddRange(message.To);
             emailMessage.Subject = message.Subject;
             emailMessage.Body = new TextPart(MimeKit.Text.TextFormat.Text) { Text = message.Content };
+            return emailMessage;
+        }
+
+        private async Task<MimeMessage> CreateEmailMessage<T>(ModeledMessage<T> message)
+        {
+            var emailMessage = new MimeMessage();
+            emailMessage.From.Add(new MailboxAddress(_emailConfig.Name, _emailConfig.FromEmail));
+            emailMessage.To.AddRange(message.To);
+            emailMessage.Subject = message.Subject;
+            var content = await _renderer.Render(message.Model);
+            emailMessage.Body = new TextPart(MimeKit.Text.TextFormat.Html) { Text = content };
             return emailMessage;
         }
 

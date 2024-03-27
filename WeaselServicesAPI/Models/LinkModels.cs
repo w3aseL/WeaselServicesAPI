@@ -23,4 +23,10 @@ namespace WeaselServicesAPI
             };
         }
     }
+
+    public class LinkOrderModel
+    {
+        public int LinkId { get; set; }
+        public bool IncreaseOrder { get; set; }
+    }
 }

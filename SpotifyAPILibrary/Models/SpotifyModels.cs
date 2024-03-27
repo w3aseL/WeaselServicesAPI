@@ -171,6 +171,50 @@ namespace SpotifyAPILibrary.Models
         public int SessionCount { get; set; }
     }
 
+    public sealed class SpotifyPlaylistGenerationModel
+    {
+        public string PlaylistTitle { get; set; }
+        public string PlaylistDescription { get; set; }
+        public int SongCount { get; set; }
+        public Func<DateTime, DateTime> DateOperation { get; set; }
+
+        public SpotifyPlaylistGenerationModel() { }
+
+        public SpotifyPlaylistGenerationModel(string playlistTitle, string playlistDescription, int songCount)
+        {
+            PlaylistTitle = playlistTitle;
+            PlaylistDescription = playlistDescription;
+            SongCount = songCount;
+        }
+
+        public SpotifyPlaylistGenerationModel(string playlistTitle, string playlistDescription, int songCount, Func<DateTime, DateTime> dateOp)
+        {
+            PlaylistTitle = playlistTitle;
+            PlaylistDescription = playlistDescription;
+            SongCount = songCount;
+            DateOperation = dateOp;  
+        }
+    }
+
+    public static class SpotifyPlaylistGenerationReferences
+    {
+        private static List<SpotifyPlaylistGenerationModel> GenerationOptions = new List<SpotifyPlaylistGenerationModel>
+        {
+            new SpotifyPlaylistGenerationModel("Personal Top Listens (All-Time)", "An API generated playlist with 100 of my top listened songs tracked by my personal API.", 100),
+            new SpotifyPlaylistGenerationModel("Personal Top Listens (3 Months)", "An API generated playlist with 40 of my top listened songs from the past 3 months tracked by my personal API.", 40, endDate => endDate.AddMonths(-3))
+        };
+
+        public static List<SpotifyPlaylistGenerationModel> GetGenerationOptions()
+        {
+            return GenerationOptions;
+        }
+
+        public static SpotifyPlaylistGenerationModel GetGenerationOptionById(int option)
+        {
+            return option > GenerationOptions.Count - 1 || option < 0 ? null : GenerationOptions[option];
+        }
+    }
+
     public static class SpotifyUriTranslator
     {
         public static string ConvertUriToHref(string uri)

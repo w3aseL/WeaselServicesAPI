@@ -1,4 +1,5 @@
 ﻿using DataAccessLayer;
+using DataAccessLayer.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using PortfolioLibrary.Services;
@@ -64,6 +65,21 @@ namespace WeaselServicesAPI.Controllers
                 _service.DeleteLink(linkId);
 
                 return ResponseHelper.GenerateResponse(new {}, (int)HttpStatusCode.OK);
+            }
+            catch (Exception e)
+            {
+                return ResponseHelper.GenerateResponse(new { Message = e.Message }, (int)HttpStatusCode.InternalServerError);
+            }
+        }
+
+        [HttpPost, Route("order"), Authorize]
+        public JsonResult ChangeLinkOrder([FromBody] LinkOrderModel model)
+        {
+            try
+            {
+                _service.ChangeLinkOrder(model.LinkId, model.IncreaseOrder);
+
+                return ResponseHelper.GenerateResponse(new { }, (int)HttpStatusCode.OK);
             }
             catch (Exception e)
             {

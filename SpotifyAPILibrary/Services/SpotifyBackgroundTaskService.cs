@@ -9,6 +9,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using WebSocketService;
 
 namespace SpotifyAPILibrary
 {
@@ -20,14 +21,16 @@ namespace SpotifyAPILibrary
         private readonly IServiceProvider _serviceProvider;
         private ILogger<SpotifyBackgroundTaskService> _logger;
         private SpotifyStateManager _manager;
+        private ConnectionManager _connectionManager;
 
-        public SpotifyBackgroundTaskService(IServiceProvider serviceProvider, ILogger<SpotifyBackgroundTaskService> logger, SpotifySettings settings, SpotifyClientFactory factory, SpotifyStateManager manager)
+        public SpotifyBackgroundTaskService(IServiceProvider serviceProvider, ILogger<SpotifyBackgroundTaskService> logger, SpotifySettings settings, SpotifyClientFactory factory, SpotifyStateManager manager, ConnectionManager connManager)
         {
             _settings = settings;
             _clientFactory = factory;
             _serviceProvider = serviceProvider;
             _logger = logger;
             _manager = manager;
+            _connectionManager = connManager;
         }
 
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
@@ -65,7 +68,13 @@ namespace SpotifyAPILibrary
                         var (stateUpdates, stateUpdateMessage) = _manager.UpdateActiveState(account.SpotifyAuthId, currentlyPlaying);
 
                         if (stateUpdates)
+                        {
                             _logger.LogInformation(stateUpdateMessage, DateTime.Now);
+
+                            // emit active state
+                            var currentState = _manager.GetActiveState(account.SpotifyAuthId);
+                            await _connectionManager.EmitEvent($"update:player-status:{account.SpotifyAuthId}", currentState);
+                        }
                     } catch(Exception ex)
                     {
                         _logger.LogError(ex.Message);

@@ -14,6 +14,8 @@ using PortfolioLibrary.Services;
 using EmailService;
 using DataAccessLayer.Configuration;
 using SpotifyAPILibrary.Services;
+using WeaselServicesAPI.Attributes;
+using WebSocketService;
 
 const string CORS_POLICY_NAME = "DashboardPolicy";
 
@@ -22,6 +24,10 @@ var builder = WebApplication.CreateBuilder(args);
 // Add services to the container.
 builder.Logging.ClearProviders();
 builder.Logging.AddConsole();
+
+// Connection manager
+var wsConnectionManager = new ConnectionManager();
+builder.Services.AddSingleton(wsConnectionManager);
 
 builder.Services.AddControllersWithViews();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
@@ -37,6 +43,7 @@ builder.Services.AddDbContext<ServicesAPIContext>(
 // email system
 var emailConfig = builder.Configuration.GetSection("EmailSettings").Get<EmailSettings>();
 builder.Services.AddSingleton<EmailSettings>(emailConfig);
+builder.Services.AddScoped<IEmailRenderer, RazorEmailRenderer>();
 builder.Services.AddScoped<IEmailSender, EmailSender>();
 
 // jwt token generator
@@ -56,6 +63,9 @@ builder.Services.AddScoped<ISpotifyAPI, SpotifyAPILibrary.SpotifyAPI>();
 var s3Settings = builder.Configuration.GetSection("S3Settings").Get<S3Settings>();
 builder.Services.AddSingleton<S3Settings>(s3Settings);
 builder.Services.AddSingleton<S3Service>();
+
+// attributes
+builder.Services.AddScoped<MobileAuthorizationAttribute>();
 
 builder.Services.AddDatabaseDeveloperPageExceptionFilter();
 
@@ -104,6 +114,14 @@ builder.Services.AddHostedService(provider => provider.GetRequiredService<Spotif
 
 var app = builder.Build();
 
+var webSocketSettings = new WebSocketOptions
+{
+    KeepAliveInterval = TimeSpan.FromSeconds(30)
+};
+
+app.UseWebSockets(webSocketSettings);
+app.UseStaticFiles();
+
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment() || app.Environment.EnvironmentName == "QA")
 {
@@ -118,7 +136,7 @@ app.Use(async (context, next) =>
 {
     await next();
 
-    if (context.Response.StatusCode == (int)System.Net.HttpStatusCode.Unauthorized)
+    if (!context.Response.HasStarted && context.Response.StatusCode == (int)System.Net.HttpStatusCode.Unauthorized)
     {
         await context.Response.WriteAsJsonAsync(new { Message = "Token Validation Has Failed. Request Access Denied" });
     }

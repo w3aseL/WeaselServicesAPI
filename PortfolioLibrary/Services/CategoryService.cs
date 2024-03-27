@@ -22,7 +22,7 @@ namespace PortfolioLibrary.Services
             if (string.IsNullOrEmpty(name))
                 throw new ArgumentNullException("No name provided to create a category!");
 
-            if (_ctx.Categories.FirstOrDefault(c => c.Name == name) is null)
+            if (_ctx.Categories.FirstOrDefault(c => c.Name == name) != null)
                 throw new ApplicationException("A category with that name already exists!");
 
             var category = new Category()
@@ -41,9 +41,9 @@ namespace PortfolioLibrary.Services
             return _ctx.Categories.ToList();
         }
 
-        public void RemoveCategory(string name)
+        public void RemoveCategory(int id)
         {
-            var category = _ctx.Categories.FirstOrDefault(c => c.Name == name);
+            var category = _ctx.Categories.FirstOrDefault(c => c.Id == id);
 
             if (category is null)
                 throw new ApplicationException("A category with that name does not exists!");

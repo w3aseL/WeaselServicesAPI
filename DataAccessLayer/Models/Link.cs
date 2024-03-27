@@ -14,4 +14,6 @@ public partial class Link
     public string? LogoUrl { get; set; }
 
     public string? LogoAlt { get; set; }
+
+    public int? OrderNumber { get; set; }
 }

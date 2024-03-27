@@ -15,4 +15,18 @@ namespace EmailService.Models
             Content = content;
         }
     }
+
+    public class ModeledMessage<T>
+    {
+        public List<MailboxAddress> To { get; set; }
+        public string Subject { get; set; }
+        public T Model { get; set; }
+        public ModeledMessage(IEnumerable<string> to, string subject, T model)
+        {
+            To = new List<MailboxAddress>();
+            To.AddRange(to.Select(x => new MailboxAddress("", x)));
+            Subject = subject;
+            Model = model;
+        }
+    }
 }

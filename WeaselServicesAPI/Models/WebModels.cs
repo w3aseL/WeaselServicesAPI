@@ -11,4 +11,9 @@
         public DateTime? StartDate { get; set; }
         public DateTime? EndDate { get; set; }
     }
+
+    public class PlaylistParams
+    {
+        public int PlaylistOption { get; set; }
+    }
 }

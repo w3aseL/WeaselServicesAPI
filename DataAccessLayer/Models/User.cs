@@ -21,6 +21,8 @@ public partial class User
 
     public int? RoleId { get; set; }
 
+    public virtual ICollection<AuthenticationMethod> AuthenticationMethods { get; set; } = new List<AuthenticationMethod>();
+
     public virtual ICollection<BlacklistedToken> BlacklistedTokens { get; set; } = new List<BlacklistedToken>();
 
     public virtual ICollection<BlogAuthor> BlogAuthors { get; set; } = new List<BlogAuthor>();

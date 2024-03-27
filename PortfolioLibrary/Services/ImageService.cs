@@ -26,7 +26,12 @@ namespace PortfolioLibrary.Services
 
         public Image GetImage(string id)
         {
-            var image = _ctx.Images.FirstOrDefault(i => i.Id.ToString() == id);
+            var guid = Guid.NewGuid();
+
+            if (Guid.TryParse(id, out Guid outGuid))
+                guid = outGuid;
+
+            var image = _ctx.Images.FirstOrDefault(i => i.Id == guid);
 
             if (image is null)
                 throw new ArgumentNullException("There is no image that exists with that identifier!");

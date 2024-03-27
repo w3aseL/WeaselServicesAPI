@@ -1,8 +1,10 @@
 ﻿using DataAccessLayer;
+using DataAccessLayer.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using SpotifyAPI.Web;
 using SpotifyAPILibrary;
+using SpotifyAPILibrary.Models;
 using System.Data.SqlTypes;
 using System.Net;
 using System.Security.Claims;
@@ -403,6 +405,34 @@ namespace WeaselServicesAPI.Controllers
             }
         }
         */
+
+        [HttpGet, Route("playlist")]
+        public JsonResult GetPlaylistGenOptions()
+        {
+            return ResponseHelper.GenerateResponse(SpotifyPlaylistGenerationReferences.GetGenerationOptions().Select(o => o.PlaylistTitle).ToList(), (int)HttpStatusCode.OK);
+        }
+
+        [HttpPost, Route("playlist"), Authorize]
+        public async Task<JsonResult> GeneratePlaylist([FromBody] PlaylistParams model)
+        {
+            try
+            {
+                var identity = HttpContext.User.Identity as ClaimsIdentity;
+                var uuidStr = identity.FindFirst(ClaimTypes.NameIdentifier).Value;
+
+                Guid? uuid = null;
+
+                if (Guid.TryParse(uuidStr, out Guid guid)) uuid = guid;
+
+                var userId = _ctx.Users.Where(u => u.Uuid == uuid).FirstOrDefault()?.UserId ?? -1;
+
+                return ResponseHelper.GenerateResponse(await _spotify.GeneratePlaylist(userId, model.PlaylistOption), (int)HttpStatusCode.Created);
+            }
+            catch (Exception e)
+            {
+                return ResponseHelper.GenerateResponse(new { Message = e.Message }, (int)HttpStatusCode.InternalServerError);
+            }
+        }
 
     }
 }

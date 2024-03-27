@@ -37,6 +37,7 @@
     <ProjectReference Include="..\EmailService\EmailService.csproj" />
     <ProjectReference Include="..\PortfolioLibrary\PortfolioLibrary.csproj" />
     <ProjectReference Include="..\SpotifyAPILibrary\SpotifyAPILibrary.csproj" />
+    <ProjectReference Include="..\WebSocketService\WebSocketService.csproj" />
   </ItemGroup>
 
 </Project>

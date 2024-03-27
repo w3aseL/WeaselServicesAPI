@@ -5,6 +5,7 @@ VisualStudioVersion = 17.4.33213.308
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WeaselServicesAPI", "WeaselServicesAPI\WeaselServicesAPI.csproj", "{0CE760D4-4C0F-40C6-BF3D-C11C31387D15}"
 	ProjectSection(ProjectDependencies) = postProject
+		{34C09886-05F9-430C-BD37-F446216748B2} = {34C09886-05F9-430C-BD37-F446216748B2}
 		{5B748EEF-C861-4D1F-9E00-449A27EE6649} = {5B748EEF-C861-4D1F-9E00-449A27EE6649}
 		{724FF293-C8E0-422B-8472-BBEB5F0DA55A} = {724FF293-C8E0-422B-8472-BBEB5F0DA55A}
 		{73136897-1D70-46D4-A126-5ECF523695E7} = {73136897-1D70-46D4-A126-5ECF523695E7}
@@ -16,6 +17,9 @@ EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DataAccessLayer", "DataAccessLayer\DataAccessLayer.csproj", "{9CCCBF8B-2CF8-4B66-86DD-F805473C3574}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SpotifyAPILibrary", "SpotifyAPILibrary\SpotifyAPILibrary.csproj", "{73136897-1D70-46D4-A126-5ECF523695E7}"
+	ProjectSection(ProjectDependencies) = postProject
+		{34C09886-05F9-430C-BD37-F446216748B2} = {34C09886-05F9-430C-BD37-F446216748B2}
+	EndProjectSection
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PortfolioLibrary", "PortfolioLibrary\PortfolioLibrary.csproj", "{5B748EEF-C861-4D1F-9E00-449A27EE6649}"
 	ProjectSection(ProjectDependencies) = postProject
@@ -23,6 +27,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PortfolioLibrary", "Portfol
 	EndProjectSection
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "EmailService", "EmailService\EmailService.csproj", "{724FF293-C8E0-422B-8472-BBEB5F0DA55A}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WebSocketService", "WebSocketService\WebSocketService.csproj", "{34C09886-05F9-430C-BD37-F446216748B2}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -98,6 +104,16 @@ Global
 		{724FF293-C8E0-422B-8472-BBEB5F0DA55A}.QA|Any CPU.Build.0 = Debug|Any CPU
 		{724FF293-C8E0-422B-8472-BBEB5F0DA55A}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{724FF293-C8E0-422B-8472-BBEB5F0DA55A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{34C09886-05F9-430C-BD37-F446216748B2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{34C09886-05F9-430C-BD37-F446216748B2}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{34C09886-05F9-430C-BD37-F446216748B2}.Development|Any CPU.ActiveCfg = Debug|Any CPU
+		{34C09886-05F9-430C-BD37-F446216748B2}.Development|Any CPU.Build.0 = Debug|Any CPU
+		{34C09886-05F9-430C-BD37-F446216748B2}.Production|Any CPU.ActiveCfg = Debug|Any CPU
+		{34C09886-05F9-430C-BD37-F446216748B2}.Production|Any CPU.Build.0 = Debug|Any CPU
+		{34C09886-05F9-430C-BD37-F446216748B2}.QA|Any CPU.ActiveCfg = Debug|Any CPU
+		{34C09886-05F9-430C-BD37-F446216748B2}.QA|Any CPU.Build.0 = Debug|Any CPU
+		{34C09886-05F9-430C-BD37-F446216748B2}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{34C09886-05F9-430C-BD37-F446216748B2}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -15,6 +15,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\DataAccessLayer\DataAccessLayer.csproj" />
+    <ProjectReference Include="..\WebSocketService\WebSocketService.csproj" />
   </ItemGroup>
 
 </Project>

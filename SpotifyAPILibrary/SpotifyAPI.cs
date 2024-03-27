@@ -245,6 +245,24 @@ namespace SpotifyAPILibrary
             return playlist != null ? new SpotifyPlaylistModel(playlist) : null;
         }
 
+        public async Task<SpotifyPlaylistModel> GeneratePlaylist(int userId, int playlistOption)
+        {
+            var accessToken = await _lookup.GetAccountAccessToken(userId, _settings.ClientId, _settings.ClientSecret);
+
+            var client = _clientFactory.CreateUserClient(accessToken);
+
+            var option = SpotifyPlaylistGenerationReferences.GetGenerationOptionById(playlistOption);
+
+            if (option == null) return null;
+
+            var now = DateTime.Now;
+
+            var playlist = await _playlistService.CreatePlaylistByTimespan(client, option.SongCount, option.PlaylistTitle, $"{ option.PlaylistDescription } Last generated: {now.ToString("MM/dd/yyyy hh:mm tt")}",
+                 option.DateOperation != null ? option.DateOperation(now) : System.Data.SqlTypes.SqlDateTime.MinValue.Value);
+
+            return playlist != null ? new SpotifyPlaylistModel(playlist) : null;
+        }
+
         #endregion
     }
 }

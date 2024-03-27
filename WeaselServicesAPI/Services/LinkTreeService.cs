@@ -15,12 +15,13 @@ namespace WeaselServicesAPI.Services
 
         public List<Link> GetAllLinks()
         {
-            return _ctx.Links.ToList();
+            return _ctx.Links.OrderBy(l => l.OrderNumber).ToList();
         }
 
         public Link CreateLink(LinkModel model)
         {
             var link = model.ToDBEntry();
+            link.OrderNumber = _ctx.Links.Count() + 1;
 
             _ctx.Add(link);
             _ctx.SaveChanges();
@@ -48,7 +49,44 @@ namespace WeaselServicesAPI.Services
             if (link == null)
                 throw new ArgumentException($"Could not find link with the identifier \"{ linkId }\".");
 
+            var orderNumber = link.OrderNumber;
+
             _ctx.Links.Remove(link);
+
+            var links = _ctx.Links.ToList();
+
+            foreach (var l in links)
+            {
+                if (l.OrderNumber > orderNumber) l.OrderNumber -= 1;
+            }
+
+            _ctx.SaveChanges();
+        }
+
+        public void ChangeLinkOrder(int linkId, bool increase)
+        {
+            var link = _ctx.Links.FirstOrDefault(l => l.Id == linkId);
+
+            if (link == null)
+                throw new ArgumentException($"Could not find link with the identifier \"{linkId}\".");
+
+            var orderNumber = link.OrderNumber;
+
+            if (!increase)
+            {
+                var otherLink = _ctx.Links.FirstOrDefault(l => l.OrderNumber == orderNumber + 1);
+
+                if (otherLink != null) otherLink.OrderNumber -= 1;
+                link.OrderNumber += 1;
+            }
+            else
+            {
+                var otherLink = _ctx.Links.FirstOrDefault(l => l.OrderNumber == orderNumber - 1);
+
+                if (otherLink != null) otherLink.OrderNumber += 1;
+                link.OrderNumber -= 1;
+            }
+
             _ctx.SaveChanges();
         }
 

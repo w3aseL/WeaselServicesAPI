@@ -27,7 +27,12 @@ namespace PortfolioLibrary.Services
 
         public Education GetEducation(string id)
         {
-            var edu = _ctx.Educations.FirstOrDefault(e => e.Id.ToString() == id);
+            var guid = Guid.NewGuid();
+
+            if (Guid.TryParse(id, out Guid outGuid))
+                guid = outGuid;
+
+            var edu = _ctx.Educations.FirstOrDefault(e => e.Id == guid);
 
             if (edu is null)
                 throw new ArgumentNullException("There is no education object that exists with that identifier!");
@@ -35,7 +40,7 @@ namespace PortfolioLibrary.Services
             return edu;
         }
 
-        public Education CreateEducation(string schoolName, string schoolType, string rewardType, DateTime graduationDate, decimal gpa, string? major)
+        public Education CreateEducation(string schoolName, string schoolType, string rewardType, DateTime graduationDate, decimal gpa, string schoolUrl, string? major)
         {
             var edu = new Education()
             {
@@ -44,6 +49,7 @@ namespace PortfolioLibrary.Services
                 RewardType = rewardType,
                 GraduationDate = graduationDate,
                 Gpa = gpa,
+                SchoolUrl = schoolUrl,
                 Major = major
             };
 

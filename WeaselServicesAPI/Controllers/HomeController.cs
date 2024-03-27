@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using WebSocketService;
 
 namespace WeaselServicesAPI.Controllers
 {

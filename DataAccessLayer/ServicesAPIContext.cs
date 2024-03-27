@@ -14,6 +14,8 @@ public partial class ServicesAPIContext : DbContext
             { IsInitialized = true; InitializeAzureKeyVaultProvider(); }
     }
 
+    public virtual DbSet<AuthenticationMethod> AuthenticationMethods { get; set; }
+
     public virtual DbSet<BlacklistedToken> BlacklistedTokens { get; set; }
 
     public virtual DbSet<BlogAuthor> BlogAuthors { get; set; }
@@ -23,6 +25,8 @@ public partial class ServicesAPIContext : DbContext
     public virtual DbSet<BlogPost> BlogPosts { get; set; }
 
     public virtual DbSet<Category> Categories { get; set; }
+
+    public virtual DbSet<Device> Devices { get; set; }
 
     public virtual DbSet<Education> Educations { get; set; }
 
@@ -73,6 +77,26 @@ public partial class ServicesAPIContext : DbContext
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder.HasAnnotation("Scaffolding:ConnectionString", "Data Source=(local);Initial Catalog=Database;Integrated Security=true");
+
+        modelBuilder.Entity<AuthenticationMethod>(entity =>
+        {
+            entity.ToTable("AuthenticationMethod");
+
+            entity.HasIndex(e => e.UserId, "IDX_AuthenticationMethod_UserId");
+
+            entity.Property(e => e.AuthenticationTypeId).HasDefaultValueSql("1");
+            entity.Property(e => e.PhoneNumber)
+                .HasMaxLength(50)
+                .IsUnicode(false);
+            entity.Property(e => e.SecretKey)
+                .HasMaxLength(500)
+                .IsUnicode(false);
+
+            entity.HasOne(d => d.User).WithMany(p => p.AuthenticationMethods)
+                .HasForeignKey(d => d.UserId)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK_AuthenticationMethod_User");
+        });
 
         modelBuilder.Entity<BlacklistedToken>(entity =>
         {
@@ -155,6 +179,28 @@ public partial class ServicesAPIContext : DbContext
             entity.Property(e => e.Name)
                 .HasMaxLength(255)
                 .IsUnicode(false);
+        });
+
+        modelBuilder.Entity<Device>(entity =>
+        {
+            entity.ToTable("Device");
+
+            entity.Property(e => e.DeviceId)
+                .HasMaxLength(511)
+                .IsUnicode(false);
+            entity.Property(e => e.DeviceIpaddress)
+                .HasMaxLength(255)
+                .IsUnicode(false)
+                .HasColumnName("DeviceIPAddress");
+            entity.Property(e => e.DeviceName)
+                .HasMaxLength(511)
+                .IsUnicode(false);
+            entity.Property(e => e.Manufacturer)
+                .HasMaxLength(511)
+                .IsUnicode(false);
+            entity.Property(e => e.Uuid)
+                .HasDefaultValueSql("newid()")
+                .HasColumnName("UUID");
         });
 
         modelBuilder.Entity<Education>(entity =>

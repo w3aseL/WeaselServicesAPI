@@ -6,7 +6,7 @@
 	[CompanyURL] VARCHAR(1023) NOT NULL,
 	[Description] VARCHAR(MAX) NOT NULL,
 	[StartDate] DATE NOT NULL,
-	[EndDate] DATE NOT NULL,
+	[EndDate] DATE NULL,
 	[ImageId] UNIQUEIDENTIFIER NULL,
 
 	CONSTRAINT FK_Position_Image FOREIGN KEY (ImageId) REFERENCES [Image]([Id])

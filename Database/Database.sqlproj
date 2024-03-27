@@ -101,5 +101,6 @@
     <Build Include="dbo\Security\CMK-Service-API.sql" />
     <Build Include="dbo\Tables\BlogAuthor.sql" />
     <Build Include="dbo\Tables\AuthenticationMethod.sql" />
+    <Build Include="dbo\Tables\Device.sql" />
   </ItemGroup>
 </Project>
