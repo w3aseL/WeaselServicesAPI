@@ -1,5 +1,5 @@
 ﻿CREATE TABLE [dbo].[BlogPost] (
-    [BlogId]          INT            IDENTITY (1, 1) NOT NULL,
+    [BlogPostId]          INT            IDENTITY (1, 1) NOT NULL,
     [BlogTitle]       VARCHAR (1024) COLLATE Latin1_General_BIN2  ENCRYPTED WITH (
      COLUMN_ENCRYPTION_KEY = [CMKBlogKey],
      ALGORITHM = N'AEAD_AES_256_CBC_HMAC_SHA_256',
@@ -17,17 +17,14 @@
     ) NULL,
     [DateCreated]     DATETIME       NOT NULL,
     [LastModified]    DATETIME       NULL,
-    [CategoryId]      INT            NULL,
-    [AuthorId]       INT             NULL,
+    [AuthorId]        INT            NULL,
+    [IsPublished]     BIT            NOT NULL   DEFAULT (0),
+    [DatePublished]   DATETIME       NULL,
 
-    PRIMARY KEY CLUSTERED ([BlogId] ASC),
-    CONSTRAINT [FK_Post_Category] FOREIGN KEY ([CategoryId]) REFERENCES [dbo].[BlogCategory] ([CategoryId]),
-    CONSTRAINT [FK_Post_Author] FOREIGN KEY ([AuthorId]) REFERENCES [dbo].[BlogAuthor] ([Id])
+    CONSTRAINT [PK_BlogPost] PRIMARY KEY CLUSTERED ([BlogPostId] ASC),
+    CONSTRAINT [FK_BlogPost_Author] FOREIGN KEY ([AuthorId]) REFERENCES [dbo].[BlogAuthor] ([Id])
 )
 GO
 
-CREATE INDEX IDX_Post_Category ON [BlogPost]([CategoryId])
-GO
-
-CREATE INDEX IDX_Post_Author ON [BlogPost]([AuthorId])
+CREATE INDEX IDX_BlogPost_Author ON [BlogPost]([AuthorId])
 GO

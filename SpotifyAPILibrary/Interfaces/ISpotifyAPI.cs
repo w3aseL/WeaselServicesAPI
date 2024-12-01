@@ -21,7 +21,8 @@ namespace SpotifyAPILibrary
         public (int, List<SpotifyArtistStatisticModel>) GetArtistStatistics(DateTime? startDate, DateTime? endDate, int offset = 0, int? limit = null);
         public (int, List<SpotifyAlbumStatisticModel>) GetAlbumStatistics(DateTime? startDate, DateTime? endDate, int offset = 0, int? limit = null);
         public Task<SpotifyPlaylistModel> CreateTestPlaylist(int userId, string title, string description, DateTime? startDate, int songCount = 25);
-        public Task<SpotifyPlaylistModel> GeneratePlaylist(int userId, int playlistOption);
+        public Task<SpotifyPlaylistModel> GeneratePlaylist(int userId, int playlistOption, int? sessionId=null);
         public SpotifySummaryModel GetTimespanSummary(DateTime startDate, DateTime? endDate);
+        public Task<int> UpdateArtistGenres();
     }
 }

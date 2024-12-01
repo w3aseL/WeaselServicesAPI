@@ -1,6 +1,8 @@
 ﻿using DataAccessLayer;
 using DataAccessLayer.Models;
 using Microsoft.AspNetCore.Http;
+using Microsoft.EntityFrameworkCore;
+using PortfolioLibrary.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -22,26 +24,41 @@ namespace PortfolioLibrary.Services
 
         public List<Position> GetPositions()
         {
-            return _ctx.Positions.ToList();
+            return _ctx.Positions
+                .Include(p => p.Image)
+                .ToList();
         }
 
-        public Position GetPosition(string id)
+        public List<PositionViewModel> GetPositionsWithModel()
+        {
+            return _ctx.Positions
+                .Include(p => p.Image)
+                .ToList()
+                .Select(p => new PositionViewModel(p))
+                .ToList();
+        }
+
+        public PositionViewModel GetPosition(string id)
         {
             var guid = Guid.NewGuid();
 
             if (Guid.TryParse(id, out Guid outGuid))
                 guid = outGuid;
 
-            var pos = _ctx.Positions.FirstOrDefault(p => p.Id == guid);
+            var pos = _ctx.Positions
+                .Include(p => p.Image)
+                .FirstOrDefault(p => p.Id == guid);
 
             if (pos is null)
                 throw new ArgumentNullException("There is no position object that exists with that identifier!");
 
-            return pos;
+            return new PositionViewModel(pos);
         }
 
-        public Position CreatePosition(string jobTitle, string companyName, string companyUrl, string description, DateTime startDate, DateTime? endDate)
+        public PositionViewModel CreatePosition(string jobTitle, string companyName, string companyUrl, string description, DateTime startDate, DateTime? endDate, string? imageId)
         {
+            var img = GetImage(imageId);
+
             var pos = new Position
             {
                 JobTitle = jobTitle,
@@ -52,24 +69,62 @@ namespace PortfolioLibrary.Services
                 EndDate = endDate
             };
 
+            if (img != null) pos.ImageId = img.Id;
+
             _ctx.Positions.Add(pos);
             _ctx.SaveChanges();
 
-            return pos;
+            return new PositionViewModel(pos);
         }
 
-        public async Task SetLogo(string id, IFormFile logoFile)
+        public PositionViewModel UpdatePosition(string id, string jobTitle, string companyName, string companyUrl, string description, DateTime startDate, DateTime? endDate, string? imageId)
         {
+            var img = GetImage(imageId);
+
             var guid = Guid.NewGuid();
 
             if (Guid.TryParse(id, out Guid outGuid))
                 guid = outGuid;
 
-            var pos = _ctx.Positions.FirstOrDefault(e => e.Id == guid);
+            var pos = _ctx.Positions
+                .Include(p => p.Image)
+                .FirstOrDefault(p => p.Id == guid);
 
             if (pos is null)
                 throw new ArgumentNullException("There is no position object that exists with that identifier!");
 
+            if (pos.JobTitle != jobTitle) pos.JobTitle = jobTitle;
+            if (pos.CompanyName != companyName) pos.CompanyName = companyName;
+            if (pos.CompanyUrl != companyUrl) pos.CompanyUrl = companyUrl;
+            if (pos.Description != description) pos.Description = description;
+            if (pos.StartDate != startDate) pos.StartDate = startDate;
+            if (pos.EndDate != endDate) pos.EndDate = endDate;
+            if (img != null && pos.ImageId != img.Id) pos.ImageId = img.Id;
+
+            _ctx.SaveChanges();
+
+            return new PositionViewModel(pos);
+        }
+
+        private Image GetImage(string? id)
+        {
+            Image img = null;
+
+            if (id != null)
+            {
+                var guid = Guid.NewGuid();
+
+                if (Guid.TryParse(id, out Guid outGuid))
+                    guid = outGuid;
+
+                img = _ctx.Images.FirstOrDefault(img => img.Id == guid);
+            }
+
+            return img;
+        }
+
+        public async Task<Image> UploadLogo(IFormFile logoFile)
+        {
             using var tx = _ctx.Database.BeginTransaction();
 
             try
@@ -88,10 +143,9 @@ namespace PortfolioLibrary.Services
                 _ctx.Images.Add(image);
                 _ctx.SaveChanges();
 
-                pos.ImageId = image.Id;
-                _ctx.SaveChanges();
-
                 tx.Commit();
+
+                return image;
             }
             catch (Exception)
             {

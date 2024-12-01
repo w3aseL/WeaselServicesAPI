@@ -73,7 +73,7 @@ namespace SpotifyAPILibrary
 
                             // emit active state
                             var currentState = _manager.GetActiveState(account.SpotifyAuthId);
-                            await _connectionManager.EmitEvent($"update:player-status:{account.SpotifyAuthId}", currentState);
+                            await _connectionManager.EmitEvent($"update:player-status:{account.SpotifyAuthId}", currentState.SerializePlayerState());
                         }
                     } catch(Exception ex)
                     {

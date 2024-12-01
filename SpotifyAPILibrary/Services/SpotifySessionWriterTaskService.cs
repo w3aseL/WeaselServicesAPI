@@ -40,12 +40,14 @@ namespace SpotifyAPILibrary
         private readonly IServiceProvider _serviceProvider;
         private ILogger<SpotifySessionWriterTaskService> _logger;
         private SpotifySessionJobQueue _queue;
+        private readonly SpotifyClientFactory _clientFactory;
 
-        public SpotifySessionWriterTaskService(IServiceProvider serviceProvider, ILogger<SpotifySessionWriterTaskService> logger, SpotifySessionJobQueue queue)
+        public SpotifySessionWriterTaskService(IServiceProvider serviceProvider, ILogger<SpotifySessionWriterTaskService> logger, SpotifySessionJobQueue queue, SpotifyClientFactory clientFactory)
         {
             _logger = logger;
             _serviceProvider = serviceProvider;
             _queue = queue;
+            _clientFactory = clientFactory;
         }
 
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
@@ -63,6 +65,7 @@ namespace SpotifyAPILibrary
                     if (job.JobType == "AddSession")
                     {
                         using var tx = ctx.Database.BeginTransaction();
+                        var client = _clientFactory.CreateBasicClient();
 
                         try
                         {
@@ -82,6 +85,9 @@ namespace SpotifyAPILibrary
                             };
                             ctx.SpotifySessions.Add(session);
                             ctx.SaveChanges();
+
+                            // get existing genres
+                            var existingGenres = ctx.SpotifyGenres.ToList();
 
                             foreach (var songRec in currentState.SongList)
                             {
@@ -157,6 +163,34 @@ namespace SpotifyAPILibrary
                                                 };
                                                 ctx.SpotifyArtists.Add(dbArtist);
                                                 ctx.SaveChanges();
+
+                                                // get genres and save them to an artist
+                                                var fullArtist = await client.Artists.Get(artist.Id);
+
+                                                foreach(var genre in fullArtist.Genres)
+                                                {
+                                                    var existingGenre = existingGenres.FirstOrDefault(g => g.Name == genre);
+
+                                                    if (existingGenre is null)
+                                                    {
+                                                        existingGenre = new SpotifyGenre
+                                                        {
+                                                            Name = genre
+                                                        };
+                                                        ctx.SpotifyGenres.Add(existingGenre);
+                                                        ctx.SaveChanges();
+
+                                                        // save genre to existing list to prevent duplicates
+                                                        existingGenres.Add(existingGenre);
+                                                    }
+
+                                                    ctx.SpotifyArtistGenres.Add(new SpotifyArtistGenre
+                                                    {
+                                                        ArtistId = artist.Id,
+                                                        GenreId = existingGenre.Id
+                                                    });
+                                                    ctx.SaveChanges();
+                                                }
                                             }
 
                                             ctx.SpotifyArtistAlbums.Add(new SpotifyArtistAlbum()

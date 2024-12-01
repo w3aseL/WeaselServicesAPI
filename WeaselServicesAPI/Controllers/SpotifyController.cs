@@ -274,6 +274,19 @@ namespace WeaselServicesAPI.Controllers
             }
         }
 
+        [HttpGet, Route("data/genre-update")]
+        public async Task<JsonResult> UpdateArtistGenres()
+        {
+            try
+            {
+                return ResponseHelper.GenerateResponse(new { CountUpdated = await _spotify.UpdateArtistGenres() }, (int)HttpStatusCode.OK);
+            }
+            catch (Exception e)
+            {
+                return ResponseHelper.GenerateResponse(new { Message = e.Message }, (int)HttpStatusCode.InternalServerError);
+            }
+        }
+
         [HttpGet, Route("stats/songs"), Authorize]
         public JsonResult GetSongStatistics([FromQuery] DatePagingParams paging)
         {
@@ -426,7 +439,7 @@ namespace WeaselServicesAPI.Controllers
 
                 var userId = _ctx.Users.Where(u => u.Uuid == uuid).FirstOrDefault()?.UserId ?? -1;
 
-                return ResponseHelper.GenerateResponse(await _spotify.GeneratePlaylist(userId, model.PlaylistOption), (int)HttpStatusCode.Created);
+                return ResponseHelper.GenerateResponse(await _spotify.GeneratePlaylist(userId, model.PlaylistOption, model.SessionId), (int)HttpStatusCode.Created);
             }
             catch (Exception e)
             {

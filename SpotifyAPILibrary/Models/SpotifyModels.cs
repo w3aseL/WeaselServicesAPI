@@ -46,6 +46,7 @@ namespace SpotifyAPILibrary.Models
         public string Id { get; set; }
         public string Name { get; set; }
         public string Uri { get; set; }
+        public List<string> Genres { get; set; }
 
         public SpotifyArtistModel() { }
 
@@ -61,6 +62,7 @@ namespace SpotifyAPILibrary.Models
             Id = a.Id;
             Name = a.Name;
             Uri = a.Url;
+            Genres = a.SpotifyArtistGenres.Select(ag => ag.Genre).Select(g => g.Name).ToList();
         }
     }
 
@@ -201,7 +203,8 @@ namespace SpotifyAPILibrary.Models
         private static List<SpotifyPlaylistGenerationModel> GenerationOptions = new List<SpotifyPlaylistGenerationModel>
         {
             new SpotifyPlaylistGenerationModel("Personal Top Listens (All-Time)", "An API generated playlist with 100 of my top listened songs tracked by my personal API.", 100),
-            new SpotifyPlaylistGenerationModel("Personal Top Listens (3 Months)", "An API generated playlist with 40 of my top listened songs from the past 3 months tracked by my personal API.", 40, endDate => endDate.AddMonths(-3))
+            new SpotifyPlaylistGenerationModel("Personal Top Listens (3 Months)", "An API generated playlist with 40 of my top listened songs from the past 3 months tracked by my personal API.", 40, endDate => endDate.AddMonths(-3)),
+            new SpotifyPlaylistGenerationModel("Session", "N/A", 0)
         };
 
         public static List<SpotifyPlaylistGenerationModel> GetGenerationOptions()

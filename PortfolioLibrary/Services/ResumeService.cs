@@ -3,6 +3,7 @@ using DataAccessLayer.Models;
 using Microsoft.AspNetCore.Http;
 using System;
 using System.Collections.Generic;
+using System.Data.SqlTypes;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -25,7 +26,7 @@ namespace PortfolioLibrary.Services
             return _ctx.Resumes.ToList();
         }
 
-        public async Task<Resume> UploadResume(IFormFile file, DateTime creationDate)
+        public async Task<Resume> UploadResume(IFormFile file)
         {
             using var tx = _ctx.Database.BeginTransaction();
 
@@ -40,7 +41,7 @@ namespace PortfolioLibrary.Services
                 {
                     Key = key,
                     FileName = file.FileName,
-                    CreationDate = creationDate,
+                    CreationDate = SqlDateTime.MinValue.Value,
                     Url = $"{ _s3Service.GetSiteUrlFromBucketName() }{ key }"
                 };
 
@@ -56,6 +57,20 @@ namespace PortfolioLibrary.Services
                 tx.Rollback();
                 throw;
             }
+        }
+
+        public Resume UpdateResumeDate(string id, DateTime creationDate)
+        {
+            var resume = _ctx.Resumes.FirstOrDefault(r => r.Id.ToString() == id);
+
+            if (resume is null)
+                throw new ArgumentNullException("There is no resume that exists with that identifier!");
+
+            resume.CreationDate = creationDate;
+
+            _ctx.SaveChanges();
+
+            return resume;
         }
 
         public async Task DeleteResume(string id)

@@ -58,6 +58,10 @@ public partial class ServicesAPIContext : DbContext
 
     public virtual DbSet<SpotifyArtistAlbum> SpotifyArtistAlbums { get; set; }
 
+    public virtual DbSet<SpotifyArtistGenre> SpotifyArtistGenres { get; set; }
+
+    public virtual DbSet<SpotifyGenre> SpotifyGenres { get; set; }
+
     public virtual DbSet<SpotifySession> SpotifySessions { get; set; }
 
     public virtual DbSet<SpotifySong> SpotifySongs { get; set; }
@@ -143,17 +147,20 @@ public partial class ServicesAPIContext : DbContext
             entity.Property(e => e.CategoryName)
                 .HasMaxLength(511)
                 .IsUnicode(false);
+            entity.Property(e => e.TagColor)
+                .HasMaxLength(31)
+                .IsUnicode(false)
+                .HasDefaultValueSql("'ffffff'");
+            entity.Property(e => e.TagIcon)
+                .HasMaxLength(63)
+                .IsUnicode(false);
         });
 
         modelBuilder.Entity<BlogPost>(entity =>
         {
-            entity.HasKey(e => e.BlogId);
-
             entity.ToTable("BlogPost");
 
-            entity.HasIndex(e => e.AuthorId, "IDX_Post_Author");
-
-            entity.HasIndex(e => e.CategoryId, "IDX_Post_Category");
+            entity.HasIndex(e => e.AuthorId, "IDX_BlogPost_Author");
 
             entity.Property(e => e.BlogContent).IsUnicode(false);
             entity.Property(e => e.BlogDescription).IsUnicode(false);
@@ -161,15 +168,29 @@ public partial class ServicesAPIContext : DbContext
                 .HasMaxLength(1024)
                 .IsUnicode(false);
             entity.Property(e => e.DateCreated).HasColumnType("datetime");
+            entity.Property(e => e.DatePublished).HasColumnType("datetime");
             entity.Property(e => e.LastModified).HasColumnType("datetime");
 
             entity.HasOne(d => d.Author).WithMany(p => p.BlogPosts)
                 .HasForeignKey(d => d.AuthorId)
-                .HasConstraintName("FK_Post_Author");
+                .HasConstraintName("FK_BlogPost_Author");
 
-            entity.HasOne(d => d.Category).WithMany(p => p.BlogPosts)
-                .HasForeignKey(d => d.CategoryId)
-                .HasConstraintName("FK_Post_Category");
+            entity.HasMany(d => d.BlogCategories).WithMany(p => p.BlogPosts)
+                .UsingEntity<Dictionary<string, object>>(
+                    "BlogPostCategory",
+                    r => r.HasOne<BlogCategory>().WithMany()
+                        .HasForeignKey("BlogCategoryId")
+                        .OnDelete(DeleteBehavior.ClientSetNull)
+                        .HasConstraintName("FK_BlogPostCategory_BlogCategory"),
+                    l => l.HasOne<BlogPost>().WithMany()
+                        .HasForeignKey("BlogPostId")
+                        .OnDelete(DeleteBehavior.ClientSetNull)
+                        .HasConstraintName("FK_BlogPostCategory_BlogPost"),
+                    j =>
+                    {
+                        j.HasKey("BlogPostId", "BlogCategoryId");
+                        j.ToTable("BlogPostCategory");
+                    });
         });
 
         modelBuilder.Entity<Category>(entity =>
@@ -498,6 +519,36 @@ public partial class ServicesAPIContext : DbContext
                 .HasForeignKey(d => d.ArtistId)
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("FK_ArtistAlbum_Artist");
+        });
+
+        modelBuilder.Entity<SpotifyArtistGenre>(entity =>
+        {
+            entity.ToTable("SpotifyArtistGenre");
+
+            entity.HasIndex(e => e.GenreId, "IDX_SpotifyArtistGenre_SpotifySong");
+
+            entity.Property(e => e.ArtistId)
+                .HasMaxLength(255)
+                .IsUnicode(false);
+
+            entity.HasOne(d => d.Artist).WithMany(p => p.SpotifyArtistGenres)
+                .HasForeignKey(d => d.ArtistId)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK_SpotifyArtistGenre_SpotifySong");
+
+            entity.HasOne(d => d.Genre).WithMany(p => p.SpotifyArtistGenres)
+                .HasForeignKey(d => d.GenreId)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK_SpotifyArtistGenre_SpotifyGenre");
+        });
+
+        modelBuilder.Entity<SpotifyGenre>(entity =>
+        {
+            entity.ToTable("SpotifyGenre");
+
+            entity.Property(e => e.Name)
+                .HasMaxLength(511)
+                .IsUnicode(false);
         });
 
         modelBuilder.Entity<SpotifySession>(entity =>

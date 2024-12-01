@@ -40,8 +40,8 @@ const organizeArtists = (artists, useUrl=false) => {
     var artist = artists[i]
 
     if(useUrl)
-      str += `<a href="${artist.url}" target="_blank">${artist.name}</a>`
-    else str += artist.name
+      str += `<a href="${artist.Uri}" target="_blank">${artist.Name}</a>`
+    else str += artist.Name
 
     if(i < artists.length - 1) str += ", "
   }
@@ -50,7 +50,7 @@ const organizeArtists = (artists, useUrl=false) => {
 }
 
 const getTime = time => {
-  return `${Math.floor(time / 60)}:${(time % 60).toLocaleString("en-US", { minimumIntegerDigits: 2, minimumFractionDigits: 0 })}`
+    return `${Math.floor(time / 60)}:${Math.floor(time % 60).toLocaleString("en-US", { minimumIntegerDigits: 2, minimumFractionDigits: 0 })}`
 }
 
 function updateState(data) {
@@ -62,14 +62,17 @@ function updateState(data) {
 
     console.log(state)
 
-    if(state.IsPlaying) {
-        $("#artwork").attr("src", state.song.artwork_url)
-        $("#title").html(state.song.title)
-        $("#artists").html(organizeArtists(state.song.artists))
-        $("#album").html(state.song.album)
-        $("#total-time").html(getTime(state.song.duration))
-        $("#pos").css("width", `${parseInt($("#slider").width() - 4) * (state.song.position / state.song.duration)}px`)
-        $("#current-time").html(getTime(state.song.position))
+    if (state.IsPlaying) {
+        var duration = state.CurrentSong.DurationMs / 1000;
+        var songPos = state.ProgressMs / 1000;
+
+        $("#artwork").attr("src", state.CurrentSong.Album.ArtworkURL)
+        $("#title").html(state.CurrentSong.Name)
+        $("#artists").html(organizeArtists(state.CurrentSong.Artists))
+        $("#album").html(state.CurrentSong.Album.Name)
+        $("#total-time").html(getTime(state.CurrentSong.DurationMs / 1000))
+        $("#pos").css("width", `${parseInt($("#slider").width() - 4) * (songPos / duration)}px`)
+        $("#current-time").html(getTime(songPos))
     } else {
         $("#artwork").attr("src", "/static/images/blank-album-artwork.png")
         $("#title").html("Not Playing")
@@ -87,11 +90,14 @@ const continueState = () => {
     processQueue();
 
     if (state.IsPlaying) {
-        if(state.song.position < state.song.duration) {
-          $("#pos").css("width", `${(parseInt($("#slider").width()) - 4) * (state.song.position / state.song.duration)}px`)
-          $("#current-time").html(getTime(state.song.position))
-          state.song.position += 1
-        } else if(state.song.position == state.song.duration) {
+        var duration = state.CurrentSong.DurationMs / 1000;
+        var songPos = state.ProgressMs / 1000;
+
+        if (songPos < duration) {
+            $("#pos").css("width", `${(parseInt($("#slider").width()) - 4) * (songPos / duration)}px`)
+            $("#current-time").html(getTime(songPos))
+            state.ProgressMs += 1000;
+        } else if (songPos >= duration) {
           // pullData()
         }
     } else if (!state.IsPlaying && timeSinceLastCheck < 60) {
@@ -110,7 +116,8 @@ setInterval(() => {
 var ws = null;
 
 const init = () => {
-    ws = new WebSocket("wss://" + location.host + "/ws")
+    // ws = new WebSocket("wss://" + location.host + "/ws")
+    ws = new WebSocket("wss://qa.api.noahtemplet.dev/ws")
 
     const SUBSCRIPTIONS = ['update:player-status:1'];
 
@@ -121,9 +128,9 @@ const init = () => {
     });
 
     ws.addEventListener('message', (e) => {
-        console.log(e);
-
         const { event, data } = JSON.parse(e.data);
+
+        console.log({ event, data })
 
         switch (event) {
             case "message": {
@@ -135,7 +142,7 @@ const init = () => {
                 break;
             }
             default: {
-                if (type.includes("update")) {
+                if (event.includes("update")) {
                     processUpdate(data);
                 } else {
                     console.log({ event, data })

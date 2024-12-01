@@ -15,5 +15,6 @@
     public class PlaylistParams
     {
         public int PlaylistOption { get; set; }
+        public int? SessionId { get; set; }
     }
 }

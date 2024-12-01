@@ -3,6 +3,7 @@ using DataAccessLayer.Models;
 using Microsoft.EntityFrameworkCore;
 using SpotifyAPI.Web;
 using SpotifyAPILibrary.Exceptions;
+using SpotifyAPILibrary.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -177,6 +178,8 @@ namespace SpotifyAPILibrary
                 .Include(s => s.SpotifySongArtists)
                 .Include(s => s.SpotifySongArtists)
                 .ThenInclude(sa => sa.Artist)
+                .ThenInclude(a => a.SpotifyArtistGenres)
+                .ThenInclude(a => a.Genre)
                 .Include(s => s.SpotifySongAlbums)
                 .ThenInclude(sa => sa.Album)
                 .ThenInclude(a => a.SpotifyArtistAlbums)
@@ -190,6 +193,8 @@ namespace SpotifyAPILibrary
                 .Include(s => s.SpotifySongArtists)
                 .Include(s => s.SpotifySongArtists)
                 .ThenInclude(sa => sa.Artist)
+                .ThenInclude(a => a.SpotifyArtistGenres)
+                .ThenInclude(a => a.Genre)
                 .Include(s => s.SpotifySongAlbums)
                 .ThenInclude(sa => sa.Album)
                 .ThenInclude(a => a.SpotifyArtistAlbums)
@@ -208,7 +213,74 @@ namespace SpotifyAPILibrary
 
         public SpotifyArtist GetSpotifyArtist(string artistId)
         {
-            return _ctx.SpotifyArtists.FirstOrDefault(s => s.Id == artistId);
+            return _ctx.SpotifyArtists
+                .Include(sa => sa.SpotifyArtistGenres)
+                .ThenInclude(ag => ag.Genre)
+                .FirstOrDefault(s => s.Id == artistId);
+        }
+
+        public async Task<int> UpdateArtistGenres(SpotifyClient client)
+        {
+            var artistsWithNoGenre = _ctx.SpotifyArtists.Where(a => !a.SpotifyArtistGenres.Any()).ToList();
+            var artistIds = artistsWithNoGenre.Select(a => a.Id).ToList();
+            var artistsUpdated = 0;
+
+            var existingGenres = _ctx.SpotifyGenres.ToList();
+
+            using (var tx = _ctx.Database.BeginTransaction())
+            {
+                try
+                {
+                    for (var offset = 0; offset < artistIds.Count; offset += 50)
+                    {
+                        var limit = offset + 50 > artistIds.Count ? artistIds.Count - offset : 50;
+
+                        var artistsToReceive = artistIds.GetRange(offset, limit);
+
+                        var fullArtists = await client.Artists.GetSeveral(new ArtistsRequest(artistsToReceive));
+
+                        foreach (var artist in fullArtists.Artists)
+                        {
+                            // update genres
+                            foreach (var genre in artist.Genres)
+                            {
+                                var existingGenre = existingGenres.FirstOrDefault(g => g.Name == genre);
+
+                                if (existingGenre is null)
+                                {
+                                    existingGenre = new SpotifyGenre
+                                    {
+                                        Name = genre
+                                    };
+                                    _ctx.SpotifyGenres.Add(existingGenre);
+                                    _ctx.SaveChanges();
+
+                                    // save genre to existing list to prevent duplicates
+                                    existingGenres.Add(existingGenre);
+                                }
+
+                                _ctx.SpotifyArtistGenres.Add(new SpotifyArtistGenre
+                                {
+                                    ArtistId = artist.Id,
+                                    GenreId = existingGenre.Id
+                                });
+                                _ctx.SaveChanges();
+                            }
+
+                            artistsUpdated += 1;
+                        }
+                    }
+
+                    tx.Commit();
+                }
+                catch (Exception ex)
+                {
+                    tx.Rollback();
+                    throw ex;
+                }
+            }
+
+            return artistsUpdated;
         }
 
         public IQueryable<SpotifyTrackPlay> GetTrackPlaysInRange(DateTime? startDate, DateTime? endDate)
@@ -219,6 +291,8 @@ namespace SpotifyAPILibrary
                     .Include(tp => tp.Song)
                     .Include(tp => tp.Song.SpotifySongArtists)
                     .ThenInclude(sa => sa.Artist)
+                    .ThenInclude(a => a.SpotifyArtistGenres)
+                    .ThenInclude(a => a.Genre)
                     .Include(tp => tp.Song.SpotifySongAlbums)
                     .ThenInclude(sa => sa.Album)
                     .ThenInclude(a => a.SpotifyArtistAlbums)

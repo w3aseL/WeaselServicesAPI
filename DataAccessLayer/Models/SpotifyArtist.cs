@@ -13,5 +13,7 @@ public partial class SpotifyArtist
 
     public virtual ICollection<SpotifyArtistAlbum> SpotifyArtistAlbums { get; set; } = new List<SpotifyArtistAlbum>();
 
+    public virtual ICollection<SpotifyArtistGenre> SpotifyArtistGenres { get; set; } = new List<SpotifyArtistGenre>();
+
     public virtual ICollection<SpotifySongArtist> SpotifySongArtists { get; set; } = new List<SpotifySongArtist>();
 }

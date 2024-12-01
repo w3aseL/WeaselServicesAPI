@@ -5,7 +5,7 @@ namespace DataAccessLayer.Models;
 
 public partial class BlogPost
 {
-    public int BlogId { get; set; }
+    public int BlogPostId { get; set; }
 
     public string? BlogTitle { get; set; }
 
@@ -17,11 +17,13 @@ public partial class BlogPost
 
     public DateTime? LastModified { get; set; }
 
-    public int? CategoryId { get; set; }
-
     public int? AuthorId { get; set; }
+
+    public bool IsPublished { get; set; }
+
+    public DateTime? DatePublished { get; set; }
 
     public virtual BlogAuthor? Author { get; set; }
 
-    public virtual BlogCategory? Category { get; set; }
+    public virtual ICollection<BlogCategory> BlogCategories { get; set; } = new List<BlogCategory>();
 }

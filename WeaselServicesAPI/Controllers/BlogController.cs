@@ -42,7 +42,7 @@ namespace WeaselServicesAPI.Controllers
 
                 return ResponseHelper.GenerateResponse(
                     author != null ? new BlogAuthorModel(author) : new { Message = "Could not find author associated to that user!" },
-                    author != null ? (int)HttpStatusCode.OK : (int) HttpStatusCode.NotFound);
+                    author != null ? (int)HttpStatusCode.OK : (int) HttpStatusCode.BadRequest);
             }
             catch (ArgumentException e)
             {
@@ -111,7 +111,7 @@ namespace WeaselServicesAPI.Controllers
             try
             {
                 return ResponseHelper.GenerateResponse(
-                    new BlogCategoryModel(_blogService.CreateCategory(model.Name, model.IsHidden)),
+                    new BlogCategoryModel(_blogService.CreateCategory(model.CategoryName, model.IsHidden, model.CategoryColor ?? "#fff", model.CategoryLogo)),
                     (int)HttpStatusCode.OK);
             }
             catch (ArgumentException e)
@@ -182,7 +182,7 @@ namespace WeaselServicesAPI.Controllers
                 var author = _blogService.GetBlogAuthor(uuid);
 
                 return ResponseHelper.GenerateResponse(
-                    author != null ? new BlogPostModel(_blogService.CreateBlogPost(model.Title, model.Description, author.Id, model.CategoryId)) : new { Message = "Could not create a post associated to that user!" },
+                    author != null ? new BlogPostModel(_blogService.CreateBlogPost(model.Title, model.Description, author.Id, model.Categories)) : new { Message = "Could not create a post associated to that user!" },
                     author != null ? (int)HttpStatusCode.OK : (int)HttpStatusCode.NotFound);
             }
             catch (ArgumentException e)

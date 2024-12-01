@@ -66,6 +66,7 @@
   <ItemGroup>
     <None Include="dbo\SchemaCompare.scmp" />
     <None Include="dbo\Scripts\SEED.sql" />
+    <None Include="dbo\Scripts\PortfolioMigration.sql" />
   </ItemGroup>
   <ItemGroup>
     <Build Include="dbo\Tables\User.sql" />
@@ -102,5 +103,8 @@
     <Build Include="dbo\Tables\BlogAuthor.sql" />
     <Build Include="dbo\Tables\AuthenticationMethod.sql" />
     <Build Include="dbo\Tables\Device.sql" />
+    <Build Include="dbo\Tables\BlogPostCategory.sql" />
+    <Build Include="dbo\Tables\SpotifyGenre.sql" />
+    <Build Include="dbo\Tables\SpotifyArtistGenre.sql" />
   </ItemGroup>
 </Project>

@@ -1,0 +1,6 @@
+﻿CREATE TABLE [dbo].[SpotifyGenre]
+(
+	[Id] INT NOT NULL PRIMARY KEY IDENTITY(1,1),
+	[Name] VARCHAR(511) NOT NULL
+)
+GO

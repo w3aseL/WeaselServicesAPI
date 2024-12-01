@@ -1,6 +1,8 @@
 ﻿using DataAccessLayer;
 using DataAccessLayer.Models;
 using Microsoft.AspNetCore.Http;
+using Microsoft.EntityFrameworkCore;
+using PortfolioLibrary.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -20,52 +22,86 @@ namespace PortfolioLibrary.Services
             _s3Service = s3Service;
         }
 
-        public List<Education> GetEducations()
+        public List<EducationViewModel> GetEducations()
         {
-            return _ctx.Educations.ToList();
+            return _ctx.Educations
+                .Include(e => e.Image)
+                .ToList()
+                .Select(e => new EducationViewModel(e))
+                .ToList();
         }
 
-        public Education GetEducation(string id)
+        public List<Education> GetEducationsNoModel()
+        {
+            return _ctx.Educations
+                .Include(e => e.Image)
+                .ToList();
+        }
+
+        public EducationViewModel GetEducation(string id)
         {
             var guid = Guid.NewGuid();
 
             if (Guid.TryParse(id, out Guid outGuid))
                 guid = outGuid;
 
-            var edu = _ctx.Educations.FirstOrDefault(e => e.Id == guid);
+            var edu = _ctx.Educations
+                .Include(e => e.Image)
+                .FirstOrDefault(e => e.Id == guid);
 
             if (edu is null)
                 throw new ArgumentNullException("There is no education object that exists with that identifier!");
 
-            return edu;
+            return new EducationViewModel(edu);
         }
 
-        public Education CreateEducation(string schoolName, string schoolType, string rewardType, DateTime graduationDate, decimal gpa, string schoolUrl, string? major)
+        public EducationViewModel CreateEducation(string schoolName, string schoolType, string rewardType, DateTime graduationDate, decimal gpa, string schoolUrl, string? major, string? imageId)
         {
-            var edu = new Education()
+            using var tx = _ctx.Database.BeginTransaction();        // y i did this?
+
+            try
             {
-                SchoolName = schoolName,
-                SchoolType = schoolType,
-                RewardType = rewardType,
-                GraduationDate = graduationDate,
-                Gpa = gpa,
-                SchoolUrl = schoolUrl,
-                Major = major
-            };
+                Image img = null;
 
-            _ctx.Educations.Add(edu);
-            _ctx.SaveChanges();
+                if (imageId != null)
+                {
+                    var guid = Guid.NewGuid();
 
-            return edu;
+                    if (Guid.TryParse(imageId, out Guid outGuid))
+                        guid = outGuid;
+
+                    img = _ctx.Images.FirstOrDefault(img => img.Id == guid);
+                }
+
+                var edu = new Education()
+                {
+                    SchoolName = schoolName,
+                    SchoolType = schoolType,
+                    RewardType = rewardType,
+                    GraduationDate = graduationDate,
+                    Gpa = gpa,
+                    SchoolUrl = schoolUrl,
+                    Major = major
+                };
+
+                if (img != null) edu.ImageId = img.Id;
+
+                _ctx.Educations.Add(edu);
+                _ctx.SaveChanges();
+
+                tx.Commit();
+
+                return new EducationViewModel(edu);
+            }
+            catch (Exception)
+            {
+                tx.Rollback();
+                throw;
+            }
         }
 
-        public async Task SetLogo(string id, IFormFile logoFile)
+        public async Task<Image> UploadLogo(IFormFile logoFile)
         {
-            var edu = _ctx.Educations.FirstOrDefault(e => e.Id.ToString() == id);
-
-            if (edu is null)
-                throw new ArgumentNullException("There is no education object that exists with that identifier!");
-
             using var tx = _ctx.Database.BeginTransaction();
 
             try
@@ -84,10 +120,9 @@ namespace PortfolioLibrary.Services
                 _ctx.Images.Add(image);
                 _ctx.SaveChanges();
 
-                edu.ImageId = image.Id;
-                _ctx.SaveChanges();
-
                 tx.Commit();
+
+                return image;
             }
             catch (Exception)
             {

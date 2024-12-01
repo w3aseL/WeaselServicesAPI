@@ -31,6 +31,7 @@ namespace SpotifyAPILibrary
 
         private Stopwatch SessionStopwatch { get; set; }
         private Stopwatch SongStopwatch { get; set; }
+        public decimal Position { get; set; }
         private int SpotifyAccountId { get; set; }
         private SpotifySessionJobQueue _queue;
 
@@ -44,6 +45,7 @@ namespace SpotifyAPILibrary
             InactivityStopwatch = new Stopwatch();
             _queue = queue;
             SkipCount = 0;
+            Position = 0;
         }
 
         private bool CheckIfSongIsToBeAdded()
@@ -165,6 +167,8 @@ namespace SpotifyAPILibrary
 
                     stateChangeMessage = $"Spotify session for user {SpotifyAccountId} has changed songs! {(prevSong != null ? $"Previous song: \"{prevSong.Name}\", " : "")}Current Song: \"{CurrentSong.Name}\".";
                 }
+
+                Position = ctx.ProgressMs;
             }
 
             if (IsPlaying && !IsSessionActive)
@@ -190,9 +194,9 @@ namespace SpotifyAPILibrary
             return SessionStopwatch.Elapsed.TotalSeconds;
         }
 
-        public long GetActiveSongTime()
+        public double GetActiveSongTime()
         {
-            return SongStopwatch.ElapsedMilliseconds;
+            return SongStopwatch.Elapsed.TotalMilliseconds;
         }
 
         public SpotifyPlayerStateModel SerializePlayerState()
@@ -219,9 +223,10 @@ namespace SpotifyAPILibrary
         public SpotifySongModel CurrentSong { get; set; }
         public SpotifySongModel PreviousSong { get; set; }
         public List<SpotifySessionSongRecord> SongList { get; set; }
-        public double TimeInactive { get; set; }
-        public double SessionLength { get; set; }
+        public long TimeInactive { get; set; }
+        public long SessionLength { get; set; }
         public long SongPositionMs { get; set; }
+        public long ProgressMs { get; set; }
         public int SkipCount { get; set; }
 
         public SpotifyPlayerStateModel(SpotifyPlayerActiveState state)
@@ -232,9 +237,10 @@ namespace SpotifyAPILibrary
             PreviousSong = state.PreviousSong;
             SongList = state.SongList;
             StartTime = state.SessionStartTime;
-            TimeInactive = state.GetTimeInactive();
-            SessionLength = state.GetSessionTime();
-            SongPositionMs = state.GetActiveSongTime();
+            TimeInactive = (long) state.GetTimeInactive();
+            SessionLength = (long) state.GetSessionTime();
+            SongPositionMs = (long) state.GetActiveSongTime();
+            ProgressMs = (long) state.Position;
             SkipCount = state.SkipCount;
         }
     }

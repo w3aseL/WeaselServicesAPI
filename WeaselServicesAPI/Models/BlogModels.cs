@@ -1,4 +1,5 @@
 ﻿using DataAccessLayer.Models;
+using Newtonsoft.Json;
 
 namespace WeaselServicesAPI
 {
@@ -9,15 +10,19 @@ namespace WeaselServicesAPI
 
     public class NewBlogCategory
     {
-        public string Name { get; set; }
+        public string CategoryName { get; set; }
         public bool IsHidden { get; set; }
+        [JsonProperty(NullValueHandling = NullValueHandling.Ignore)]
+        public string? CategoryColor { get; set; }
+        [JsonProperty(NullValueHandling = NullValueHandling.Ignore)]
+        public string? CategoryLogo { get; set; }
     }
 
     public class NewBlogPost
     {
         public string Title { get; set; }
         public string Description { get; set; }
-        public int CategoryId { get; set; }
+        public List<int> Categories { get; set; }
     }
 
     public class UpdateBlogPostDetails
@@ -47,6 +52,9 @@ namespace WeaselServicesAPI
     {
         public int CategoryId { get; set; }
         public string CategoryName { get; set; }
+        public string CategoryColor { get; set; }
+        public string CategoryLogo { get; set; }
+        public bool IsHidden { get; set; }
 
         public BlogCategoryModel() { }
 
@@ -54,6 +62,9 @@ namespace WeaselServicesAPI
         {
             CategoryId = category.CategoryId;
             CategoryName = category.CategoryName;
+            CategoryColor = category.TagColor;
+            CategoryLogo = category.TagIcon;
+            IsHidden = category.IsHidden;
         }
     }
 
@@ -64,16 +75,16 @@ namespace WeaselServicesAPI
         public string Description { get; set; }
         public string Content { get; set; }
         public BlogAuthorModel Author { get; set; }
-        public BlogCategoryModel Category { get; set; }
+        public List<BlogCategoryModel> Categories { get; set; }
 
         public BlogPostModel(BlogPost post)
         {
-            PostId = post.BlogId;
+            PostId = post.BlogPostId;
             Title = post.BlogTitle;
             Description = post.BlogDescription;
             Content = post.BlogContent;
             Author = new BlogAuthorModel(post.Author);
-            Category= new BlogCategoryModel(post.Category);
+            Categories = post.BlogCategories.Select(c => new BlogCategoryModel(c)).ToList();
         }
     }
 }

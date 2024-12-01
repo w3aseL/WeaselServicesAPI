@@ -84,7 +84,7 @@ namespace SpotifyAPILibrary
                 return;
             }
 
-            var currentState = GetActiveState(accountId.Value);
+            var currentState = GetActiveState(accountId.Value).SerializePlayerState();
 
             if (currentState is null)
             {

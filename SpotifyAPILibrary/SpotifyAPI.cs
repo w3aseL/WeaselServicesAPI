@@ -139,6 +139,13 @@ namespace SpotifyAPILibrary
             return artist != null ? new SpotifyArtistModel(artist) : new SpotifyArtistModel();
         }
 
+        public async Task<int> UpdateArtistGenres()
+        {
+            var client = _clientFactory.CreateBasicClient();
+
+            return await _lookup.UpdateArtistGenres(client);
+        }
+
         #endregion
 
         #region Statistics
@@ -245,7 +252,7 @@ namespace SpotifyAPILibrary
             return playlist != null ? new SpotifyPlaylistModel(playlist) : null;
         }
 
-        public async Task<SpotifyPlaylistModel> GeneratePlaylist(int userId, int playlistOption)
+        public async Task<SpotifyPlaylistModel> GeneratePlaylist(int userId, int playlistOption, int? sessionId=null)
         {
             var accessToken = await _lookup.GetAccountAccessToken(userId, _settings.ClientId, _settings.ClientSecret);
 
@@ -257,10 +264,23 @@ namespace SpotifyAPILibrary
 
             var now = DateTime.Now;
 
-            var playlist = await _playlistService.CreatePlaylistByTimespan(client, option.SongCount, option.PlaylistTitle, $"{ option.PlaylistDescription } Last generated: {now.ToString("MM/dd/yyyy hh:mm tt")}",
+            if (playlistOption == 1 || playlistOption == 2)
+            {
+                var playlist = await _playlistService.CreatePlaylistByTimespan(client, option.SongCount, option.PlaylistTitle, $"{option.PlaylistDescription} Last generated: {now.ToString("MM/dd/yyyy hh:mm tt")}",
                  option.DateOperation != null ? option.DateOperation(now) : System.Data.SqlTypes.SqlDateTime.MinValue.Value);
 
-            return playlist != null ? new SpotifyPlaylistModel(playlist) : null;
+                return playlist != null ? new SpotifyPlaylistModel(playlist) : null;
+            }
+            else if (playlistOption == 3)
+            {
+                if (sessionId == null) return null;
+
+                var playlist = await _playlistService.CreatePlaylistBySession(client, userId, sessionId.Value);
+
+                return playlist != null ? new SpotifyPlaylistModel(playlist) : null;
+            }
+
+            return null;
         }
 
         #endregion

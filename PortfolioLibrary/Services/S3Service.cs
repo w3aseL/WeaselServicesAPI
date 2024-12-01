@@ -46,7 +46,7 @@ namespace PortfolioLibrary
 
         public string GetSiteUrlFromBucketName()
         {
-            return $"https://{ _settings.Bucket }/";
+            return $"https://{ _settings.Bucket }/{GetTestModeKey()}";
         }
 
         private string GetTestModeKey()
